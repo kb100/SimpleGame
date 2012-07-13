@@ -1,25 +1,30 @@
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
-public class Player
+public class Player extends Drawable
 {
-	int x, dx, ddx;
-	int y, dy, ddy;
+	int dx, ddx;
+	int dy, ddy;
 
 	int dxMax;
 	int dyMax;
 
 	int width, height;
 
+	Color color;
+	
 	public Player(int x, int y, int width, int height)
 	{
-		this.x = x;
-		this.y = y;
+		super(x,y);
 		this.width = width;
 		this.height = height;
 
 		dxMax = 10;
 		dyMax = 20;
-
+		
+		color = Color.WHITE;
+		
 		stop();
 	}
 
@@ -71,7 +76,7 @@ public class Player
 
 	public void draw(Graphics g)
 	{
-		g.setColor(Color.GRAY);
+		g.setColor(color);
 		g.fillRect(x, y, width, height);
 	}
 
