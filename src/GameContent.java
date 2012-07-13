@@ -24,7 +24,7 @@ public class GameContent extends JPanel implements ActionListener
 
 		timer = new Timer(20, this);
 		timer.start();
-		
+
 		controller = new GameController();
 		addKeyListener(controller);
 
@@ -51,15 +51,30 @@ public class GameContent extends JPanel implements ActionListener
 			player.land();
 		}
 
-		if(controller.left) player.ddx = -1;
-		else if(controller.right) player.ddx = 1;
+		if (controller.left) player.ddx = -1;
+		else if (controller.right) player.ddx = 1;
 		else player.ddx = 0;
-		
-		if(controller.jump) player.jump();
+
+		if (controller.jump) player.jump();
 		player.update();
+
+		int xShift = player.x - (GAME_WIDTH - GAME_WIDTH / 3);
+		if (xShift > 0)
+		{
+			player.unconditionalShift(-xShift, 0);
+			floor.x -= xShift;
+		}
+		else
+		{
+			xShift = GAME_WIDTH / 3 - player.x;
+			if (xShift > 0)
+			{
+				player.unconditionalShift(xShift, 0);
+				floor.x += xShift;
+			}
+		}
 
 		repaint();
 	}
 
-	
 }
