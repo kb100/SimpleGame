@@ -1,8 +1,10 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -13,6 +15,8 @@ public class GameContent extends JPanel implements ActionListener
 	final int GAME_HEIGHT = 500;
 	final int PLAYER_HEIGHT = 50;
 	final int PLAYER_WIDTH = 25;
+
+	static Random rand = new Random();
 
 	Timer timer;
 	Player player;
@@ -28,15 +32,20 @@ public class GameContent extends JPanel implements ActionListener
 
 		drawables = new ArrayList<Drawable>();
 
-		floor = new SolidRectangle(10, 480, 480, 10, Color.GRAY);
+		floor = new SolidRectangle(20, 460, 460, 20, Color.GRAY);
 		drawables.add(floor);
-		
+
+		for (int i = 0; i < 5; i++)
+		{
+			drawables.add(new SolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 50, 50, new Color(0,100,0)));
+		}
+
 		GameController controller = new GameController();
 		this.addKeyListener(controller);
 		player = new Player((GAME_WIDTH - PLAYER_WIDTH) / 2, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, controller);
 		drawables.add(player);
 
-		timer = new Timer(20, this);
+		timer = new Timer(25, this);
 		timer.start();
 	}
 
@@ -49,21 +58,40 @@ public class GameContent extends JPanel implements ActionListener
 		}
 	}
 
+	// Always a timer event
 	public void actionPerformed(ActionEvent e)
 	{
-
-		// not touching floor
-		if (!floor.toRectangle().intersects(player.toRectangle()))
+		// Slow motion for debugging purposes
+		if (player.controller.start)
 		{
-			player.ddy = 1;
+			timer.setDelay(500);
 		}
-		else
+		else if (timer.getDelay() == 500)
 		{
-			player.land();
+			timer.setDelay(25);
 		}
 
 		player.control();
 		player.update();
+
+		boolean freeFall = true;
+		for (Drawable drawable : drawables)
+		{
+			if (drawable instanceof SolidRectangle)
+			{
+				if (CollisionDetector.areColliding(player, (SolidRectangle) drawable))
+				{
+					CollisionHandler.handleCollision(player, (SolidRectangle) drawable);
+					freeFall = false;
+				}
+			}
+		}
+
+		if (freeFall)
+		{
+			// gravity
+			player.ddy = 1;
+		}
 
 		adjustFrameIfNecessary();
 		repaint();
@@ -72,9 +100,9 @@ public class GameContent extends JPanel implements ActionListener
 	public void adjustFrameIfNecessary()
 	{
 		int dx;
-		if ((dx=(GAME_WIDTH - GAME_WIDTH / 3)- player.x ) < 0 || (dx = GAME_WIDTH / 3 - player.x) > 0)
+		if ((dx = (GAME_WIDTH - GAME_WIDTH / 3) - player.x) < 0 || (dx = GAME_WIDTH / 3 - player.x) > 0)
 		{
-			for(Drawable shiftMe : drawables)
+			for (Drawable shiftMe : drawables)
 			{
 				shiftMe.unconditionalShift(dx, 0);
 			}

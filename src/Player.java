@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 
 //Does not extend SolidRectangle on purpose
 public class Player extends Drawable
@@ -14,25 +15,25 @@ public class Player extends Drawable
 	int width, height;
 
 	Color color;
-	
+
 	GameController controller;
-	
+
 	public Player(int x, int y, int width, int height, GameController controller)
 	{
-		super(x,y);
+		super(x, y);
 		this.width = width;
 		this.height = height;
 
 		dxMax = 8;
 		dyMax = 18;
-		
+
 		color = Color.WHITE;
-		
+
 		this.controller = controller;
-		
+
 		stop();
 	}
-	
+
 	public void control()
 	{
 		if (controller.left) ddx = -1;
@@ -98,4 +99,5 @@ public class Player extends Drawable
 	{
 		return new Rectangle(x, y, width, height);
 	}
+
 }
