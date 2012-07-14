@@ -27,5 +27,10 @@ public class SolidRectangle extends Drawable
 		g.setColor(color);
 		g.fillRect(x, y, width, height);
 	}
+	
+	public void remove()
+	{
+		width = height = 0;
+	}
 
 }

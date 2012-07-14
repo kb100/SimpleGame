@@ -76,7 +76,7 @@ public class Player extends Drawable
 
 	public void jump()
 	{
-		dy = -8;
+		dy = -10;
 	}
 
 	public void land()
