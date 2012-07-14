@@ -1,15 +1,35 @@
 import java.awt.Container;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
 import javax.swing.JApplet;
 
 public class SimpleGame extends JApplet
 {
     public void init()
     {
-        this.setSize(500, 500);
-        GameContent panel = new GameContent();
+        this.setSize(GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT);
+        this.setIgnoreRepaint(true);
+        final GameContent panel = new GameContent();
         Container contentPane = this.getContentPane();
         panel.setFocusable(true);
         contentPane.setLayout(null);
         contentPane.add(panel);
+        
+        this.addComponentListener
+        (
+                new ComponentListener()
+                {
+                    public void componentResized(ComponentEvent e)
+                    {
+                      panel.setLocation((e.getComponent().getWidth()-GameContent.GAME_WIDTH)/2, (e.getComponent().getHeight()-GameContent.GAME_HEIGHT)/2);
+                    }
+                    
+                    public void componentShown(ComponentEvent e){}
+                    public void componentMoved(ComponentEvent e){}
+                    public void componentHidden(ComponentEvent e){}
+                }
+        );
     }
+    
 }

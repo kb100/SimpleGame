@@ -1,16 +1,11 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.geom.Line2D;
 
 //Does not extend SolidRectangle on purpose
-public class Player extends Drawable
+public class Player extends Movable
 {
-    int dx, ddx;
-    int dy, ddy;
-
-    int dxMax;
-    int dyMax;
+    
 
     int width, height;
 
@@ -20,12 +15,9 @@ public class Player extends Drawable
 
     public Player(int x, int y, int width, int height, GameController controller, GameContent game)
     {
-        super(x, y, game);
+        super(x, y, 8 , 18, game);
         this.width = width;
         this.height = height;
-
-        dxMax = 8;
-        dyMax = 18;
 
         color = Color.WHITE;
 
@@ -45,33 +37,13 @@ public class Player extends Drawable
 
     public void update()
     {
-        x += dx;
-        dx += ddx;
-        if (dx > dxMax) dx = dxMax;
-        else if (dx < -dxMax) dx = -dxMax;
-
+        super.update();
         if (turning()) dx /= 2;
-
-        y += dy;
-        dy += ddy;
-        if (dy > dyMax) dy = dyMax;
-        else if (dy < -dyMax) dy = -dyMax;
-    }
-
-    public void unconditionalShift(int dx, int dy)
-    {
-        x += dx;
-        y += dy;
     }
 
     public boolean turning()
     {
         return dx * ddx <= 0;
-    }
-
-    public void fall()
-    {
-        ddy = 3;
     }
 
     public void jump()
@@ -82,11 +54,6 @@ public class Player extends Drawable
     public void land()
     {
         dy = ddy = 0;
-    }
-
-    public void stop()
-    {
-        dx = ddx = dy = ddy = 0;
     }
 
     public void draw(Graphics g)

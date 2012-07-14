@@ -24,4 +24,9 @@ public abstract class Drawable
     }
 
     public abstract void draw(Graphics g);
+    
+    public boolean isOnScreen()
+    {
+        return true;
+    }
 }
