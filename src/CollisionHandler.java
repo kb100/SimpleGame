@@ -10,17 +10,20 @@ public class CollisionHandler
 		if (!area.isEmpty())
 		{
 			Rectangle intersection = area.getBounds();
-			if (intersection.width < intersection.height && intersection.width > 0)
+			if (intersection.width < intersection.height)
 			{
-				//do a horizontal shift
-				player.unconditionalShift((intersection.width+1) * (player.dx < 0 ? 1 : -1), 0);
+				// do a horizontal shift
+				int sign = (intersection.getCenterX()-player.toRectangle().getCenterX()) < 0? 1:-1;
+				player.unconditionalShift((intersection.width) * sign, 0);
+				player.dx = 0;
 			}
-			else if (intersection.width > intersection.height && intersection.height > 0)
+			else if (intersection.width > intersection.height)
 			{
-				//do a vertical shift
+				// do a vertical shift
 				player.unconditionalShift(0, (intersection.height) * (player.dy < 0 ? 1 : -1));
+				player.land();
 			}
-			player.land();
+
 		}
 
 	}

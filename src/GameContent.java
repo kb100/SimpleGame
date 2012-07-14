@@ -35,9 +35,9 @@ public class GameContent extends JPanel implements ActionListener
 		floor = new SolidRectangle(20, 460, 460, 20, Color.GRAY);
 		drawables.add(floor);
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 15; i++)
 		{
-			drawables.add(new SolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 50, 50, new Color(0,100,0)));
+			drawables.add(new SolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 10+rand.nextInt(50), 10+rand.nextInt(50), new Color(0,100,0)));
 		}
 
 		GameController controller = new GameController();
