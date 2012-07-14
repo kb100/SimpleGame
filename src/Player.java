@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+//Does not extend SolidRectangle on purpose
 public class Player extends Drawable
 {
 	int dx, ddx;
@@ -14,18 +15,31 @@ public class Player extends Drawable
 
 	Color color;
 	
-	public Player(int x, int y, int width, int height)
+	GameController controller;
+	
+	public Player(int x, int y, int width, int height, GameController controller)
 	{
 		super(x,y);
 		this.width = width;
 		this.height = height;
 
-		dxMax = 10;
-		dyMax = 20;
+		dxMax = 8;
+		dyMax = 18;
 		
 		color = Color.WHITE;
 		
+		this.controller = controller;
+		
 		stop();
+	}
+	
+	public void control()
+	{
+		if (controller.left) ddx = -1;
+		else if (controller.right) ddx = 1;
+		else ddx = 0;
+
+		if (controller.jump) jump();
 	}
 
 	public void update()
@@ -61,7 +75,7 @@ public class Player extends Drawable
 
 	public void jump()
 	{
-		dy = -7;
+		dy = -8;
 	}
 
 	public void land()
