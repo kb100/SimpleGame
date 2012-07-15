@@ -15,6 +15,7 @@ public abstract class Movable extends Drawable
         stop();
     }
     
+
     public abstract void control();
     
     public void update()

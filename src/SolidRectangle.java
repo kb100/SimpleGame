@@ -8,6 +8,14 @@ public class SolidRectangle extends Movable
     int height;
     Color color;
 
+    public SolidRectangle(int x, int y, int width, int height, int dxMax, int dyMax, Color color, GameContent game)
+    {
+        super(x, y, dxMax, dyMax, game);
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+    
     public SolidRectangle(int x, int y, int width, int height, Color color, GameContent game)
     {
         super(x, y, 0, 0, game);
