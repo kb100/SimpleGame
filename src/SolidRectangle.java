@@ -29,7 +29,7 @@ public class SolidRectangle extends Movable
 
     public boolean isOnScreen()
     {
-        return x+width >= 0 && x < game.GAME_WIDTH && y+height >= 0 && y < game.GAME_HEIGHT;
+        return x+width >= 0 && x < GameContent.GAME_WIDTH && y+height >= 0 && y < GameContent.GAME_HEIGHT;
     }
 
     public void control()

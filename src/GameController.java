@@ -58,9 +58,9 @@ public class GameController implements KeyListener
         else if (code == keyRight) right = true;
         else if (code == keyUp) up = true;
         else if (code == keyDown) down = true;
+        else if (code == keyJump) jump = true;
         else if (code == keyStart) start = true;
         else if (code == keySelect) select = true;
-        else if (code == keyJump) jump = true;
         else if (code == keyExit) exit = true;
     }
 
@@ -71,10 +71,11 @@ public class GameController implements KeyListener
         else if (code == keyRight) right = false;
         else if (code == keyUp) up = false;
         else if (code == keyDown) down = false;
-        else if (code == keyStart) start = false;
-        else if (code == keySelect) select = false;
         else if (code == keyJump) jump = false;
-        else if (code == keyExit) exit = false;
+        //else if (code == keyStart) start = false;
+        //else if (code == keySelect) select = false;
+        //else if (code == keyExit) exit = false;
+        // these should be manually set back by a handler
     }
 
     public void keyTyped(KeyEvent e)

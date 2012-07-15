@@ -4,6 +4,7 @@ import java.awt.event.ComponentListener;
 
 import javax.swing.JApplet;
 
+@SuppressWarnings("serial")
 public class SimpleGame extends JApplet
 {
     public void init()

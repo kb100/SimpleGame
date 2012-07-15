@@ -1,17 +1,21 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+@SuppressWarnings("serial")
 public class GameContent extends JPanel implements ActionListener
 {
 
@@ -20,9 +24,10 @@ public class GameContent extends JPanel implements ActionListener
     static final int GAME_WIDTH = dim.width - 10;
     static final int GAME_HEIGHT = dim.height - 150;
 
-    final int PLAYER_HEIGHT = 50;
-    final int PLAYER_WIDTH = 25;
-    final int NUM_PLATFORMS = 100;
+    static final int PLAYER_HEIGHT = 50;
+    static final int PLAYER_WIDTH = 25;
+    static final int NUM_PLATFORMS = 10;
+    static final int FLAKES_PER_FRAME = 1;
 
     static Random rand = new Random();
 
@@ -33,6 +38,10 @@ public class GameContent extends JPanel implements ActionListener
 
     Timer timer;
     Player player;
+    Player player2;
+    
+    Drawable frameReference;
+    
     SolidRectangle floor;
     SnowflakeSource snowflakeSource;
 
@@ -63,7 +72,7 @@ public class GameContent extends JPanel implements ActionListener
         for (int i = 0; i < NUM_PLATFORMS; i++)
         {
 
-            drawables.add(new SolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            //drawables.add(new SolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
             drawables.add(new VanishingSolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
         }
 
@@ -72,6 +81,13 @@ public class GameContent extends JPanel implements ActionListener
         player = new Player((GAME_WIDTH - PLAYER_WIDTH) / 2, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, controller, this);
         drawables.add(player);
         movables.add(player);
+        frameReference = player;
+        
+        GameController controller2 = new GameController(KeyEvent.VK_J,KeyEvent.VK_L, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_0, KeyEvent.VK_9, KeyEvent.VK_SHIFT,KeyEvent.VK_8);
+        this.addKeyListener(controller2);
+        player2 = new Player((GAME_WIDTH - PLAYER_WIDTH) / 2+40, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, controller2, this);
+        drawables.add(player2);
+        movables.add(player2);
 
         timer = new Timer(25, this);
         timer.start();
@@ -92,26 +108,36 @@ public class GameContent extends JPanel implements ActionListener
     // Always a timer event
     public void actionPerformed(ActionEvent e)
     {
-        // Slow motion for debugging purposes
-        if (player.controller.start)
-        {
-            timer.setDelay(500);
-        }
-        else if (timer.getDelay() == 500)
-        {
-            timer.setDelay(25);
-        }
 
         if (player.controller.exit)
         {
             System.exit(0);
         }
 
-        for (int i = 0; i < 10; i++)
+        if(player.controller.select)
+        {
+            frameReference = (frameReference == player? player2 : player);
+            player.controller.select = false;
+        }
+        
+        // Slow motion for debugging purposes
+        if (player.controller.start)
+        {
+            if(timer.getDelay() == 25)timer.setDelay(500);
+            else timer.setDelay(25);
+            player.controller.start = false;
+        }
+
+
+        for (int i = 0; i < FLAKES_PER_FRAME; i++)
         {
             snowflakeSource.produceMovable();
         }
 
+        // System.out.println("drawables: " + drawables.size() + " movables: " +
+        // movables.size() + " addDrawableQueue: " + addDrawableQueue.size() +
+        // " addMovableQueue: " + addMovableQueue.size() + " removeQueue: " +
+        // removeQueue.size());
         addOrRemoveQueuedElements();
 
         for (Movable movable : movables)
@@ -127,13 +153,18 @@ public class GameContent extends JPanel implements ActionListener
                 if (CollisionDetector.areColliding(player, (SolidRectangle) drawable))
                 {
                     CollisionHandler.handleCollision(player, (SolidRectangle) drawable);
-                    // freeFall = false;
+                }
+                
+                if (CollisionDetector.areColliding(player2, (SolidRectangle) drawable))
+                {
+                    CollisionHandler.handleCollision(player2, (SolidRectangle) drawable);
                 }
             }
         }
 
         // gravity
         player.ddy = 1;
+        player2.ddy = 1;
 
         adjustFrameIfNecessary();
         repaint();
@@ -164,8 +195,8 @@ public class GameContent extends JPanel implements ActionListener
 
     public void adjustFrameIfNecessary()
     {
-        int dx = calculateShift(GAME_WIDTH, player.x);
-        int dy = calculateShift(GAME_HEIGHT, player.y);
+        int dx = calculateShift(GAME_WIDTH, frameReference.x);
+        int dy = calculateShift(GAME_HEIGHT, frameReference.y);
 
         if (dx != 0 || dy != 0)
         {
@@ -174,13 +205,31 @@ public class GameContent extends JPanel implements ActionListener
                 shiftMe.unconditionalShift(dx, dy);
             }
         }
+    }
+    
+    
+
+    List<SolidRectangle> solidRectanglesInArea(Rectangle rectangle)
+    {
+        List<SolidRectangle> rectangles = new ArrayList<SolidRectangle>();
+        for (Drawable drawable : drawables)
+        {
+            if (drawable instanceof SolidRectangle && !(drawable instanceof Snowflake))
+            {
+                if (rectangle.intersects(((SolidRectangle) drawable).toRectangle()))
+                {
+                    rectangles.add((SolidRectangle) drawable);
+                }
+            }
+        }
+        return rectangles;
 
     }
 
-    private static int calculateShift(int gameDimension, int playerDimension)
+    private static int calculateShift(int gameDimension, int referenceDimension)
     {
         int shift;
-        return ((shift = (gameDimension - gameDimension / 3) - playerDimension) < 0 || (shift = gameDimension / 3 - playerDimension) > 0) ? shift : 0;
+        return ((shift = (gameDimension - gameDimension / 3) - referenceDimension) < 0 || (shift = gameDimension / 3 - referenceDimension) > 0) ? shift : 0;
     }
 
     public synchronized void remove(Drawable drawable)

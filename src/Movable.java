@@ -1,6 +1,3 @@
-import java.awt.Graphics;
-
-
 public abstract class Movable extends Drawable
 {
     
