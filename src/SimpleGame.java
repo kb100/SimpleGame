@@ -1,17 +1,22 @@
 import java.awt.Container;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import javax.swing.JApplet;
 
 @SuppressWarnings("serial")
 public class SimpleGame extends JApplet
 {
+    GamePanel panel;
+    
     public void init()
     {
         this.setSize(GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT);
         this.setIgnoreRepaint(true);
-        final GameContent panel = new GameContent();
+        panel = new GamePanel();
         Container contentPane = this.getContentPane();
         panel.setFocusable(true);
         contentPane.setLayout(null);
@@ -23,7 +28,7 @@ public class SimpleGame extends JApplet
                 {
                     public void componentResized(ComponentEvent e)
                     {
-                      panel.setLocation((e.getComponent().getWidth()-GameContent.GAME_WIDTH)/2, (e.getComponent().getHeight()-GameContent.GAME_HEIGHT)/2);
+                        panel.setLocation((e.getComponent().getWidth()-GameContent.GAME_WIDTH)/2, (e.getComponent().getHeight()-GameContent.GAME_HEIGHT)/2);
                     }
                     
                     public void componentShown(ComponentEvent e){}
@@ -32,5 +37,7 @@ public class SimpleGame extends JApplet
                 }
         );
     }
+    
+    
     
 }

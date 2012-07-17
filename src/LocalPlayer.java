@@ -14,7 +14,7 @@ public class LocalPlayer extends Movable
 
     GameController controller;
 
-    public LocalPlayer(int x, int y, int width, int height, GameController controller, GameContent game)
+    public LocalPlayer(int x, int y, int width, int height, GameContent game)
     {
         super(x, y, 8, 18, game);
         this.width = width;
@@ -22,7 +22,6 @@ public class LocalPlayer extends Movable
 
         this.color = Color.WHITE;
 
-        this.controller = controller;
         this.crouching = false;
         crouchingHeightChange = (int)(height*.3);
 
@@ -33,7 +32,10 @@ public class LocalPlayer extends Movable
         ControllerState state = controller.getControllerState();
         if (state.exit)
         {
-            System.exit(0);
+            controller.hasBeenHandled(controller.keyExit);
+            game.panel.loadSavedState();
+//            game.saveState();
+//            System.exit(0);
         }
 
         if (state.select)
@@ -46,8 +48,9 @@ public class LocalPlayer extends Movable
         // Slow motion for debugging purposes
         if (state.start)
         {
-            game.toggleTimerSpeed();
+//            game.panel.toggleTimerSpeed();
             controller.hasBeenHandled(controller.keyStart);
+            game.panel.setSaveState();
         }
 
         if (state.left) ddx = -1;
@@ -89,7 +92,7 @@ public class LocalPlayer extends Movable
 
     public boolean roomToUncrouch()
     {
-        return game.solidRectanglesInArea(new Rectangle(x, y - crouchingHeightChange, width, height)).isEmpty();
+        return game.findSolidRectanglesInArea(new Rectangle(x, y - crouchingHeightChange, width, height)).isEmpty();
     }
 
     public void jump()

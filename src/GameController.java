@@ -1,7 +1,8 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.Serializable;
 
-public class GameController implements KeyListener, Controller
+public class GameController implements KeyListener, Controller, Serializable
 {
     int keyLeft;
     int keyRight;

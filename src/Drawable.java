@@ -1,6 +1,7 @@
 import java.awt.Graphics;
+import java.io.Serializable;
 
-public abstract class Drawable
+public abstract class Drawable implements Serializable
 {
     int x, y;
     GameContent game;

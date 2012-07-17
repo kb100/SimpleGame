@@ -1,21 +1,19 @@
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
 @SuppressWarnings("serial")
-public class GameContent extends JPanel implements ActionListener
+public class GameContent implements Serializable
 {
 
     static final Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -25,7 +23,7 @@ public class GameContent extends JPanel implements ActionListener
 
     static final int PLAYER_HEIGHT = 50;
     static final int PLAYER_WIDTH = 25;
-    static final int NUM_PLATFORMS = 30;
+    static final int NUM_PLATFORMS = 5000;
     static final int FLAKES_PER_FRAME = 1;
 
     static Random rand = new Random();
@@ -35,7 +33,9 @@ public class GameContent extends JPanel implements ActionListener
         return new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
     }
 
-    Timer timer;
+    transient GamePanel panel;
+    
+    GameContent savedState; 
     LocalPlayer player;
     LocalPlayer player2;
 
@@ -45,17 +45,19 @@ public class GameContent extends JPanel implements ActionListener
     SnowflakeSource snowflakeSource;
 
     // TODO: Keep sorted by order should be painted back to front
+    List<LocalPlayer> localPlayers;
     List<Drawable> drawables;
     List<Movable> movables;
     List<Drawable> addDrawableQueue;
     List<Movable> addMovableQueue;
     List<Drawable> removeQueue;
 
-    public GameContent()
+    public GameContent(GamePanel panel)
     {
-        this.setSize(GAME_WIDTH, GAME_HEIGHT);
-        this.setBackground(Color.BLACK);
+        this.panel = panel;
+        savedState = null;
 
+        localPlayers = new ArrayList<LocalPlayer>();
         drawables = new ArrayList<Drawable>();
         movables = new ArrayList<Movable>();
         addDrawableQueue = new ArrayList<Drawable>();
@@ -71,43 +73,26 @@ public class GameContent extends JPanel implements ActionListener
         for (int i = 0; i < NUM_PLATFORMS; i++)
         {
 
-             drawables.add(new SolidRectangle(rand.nextInt(GAME_WIDTH),
-             rand.nextInt(GAME_HEIGHT), 30 + rand.nextInt(50), 20 +
-             rand.nextInt(40), randomColor(), this));
-            drawables.add(new VanishingSolidRectangle(rand.nextInt(GAME_WIDTH), rand.nextInt(GAME_HEIGHT), 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            drawables.add(new SolidRectangle(rand.nextInt(20000) - 10000, rand.nextInt(20000) - 10000, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            drawables.add(new VanishingSolidRectangle(rand.nextInt(20000) - 10000, rand.nextInt(20000) - 10000, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
         }
 
-        GameController controller = new GameController();
-        this.addKeyListener(controller);
-        player = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, controller, this);
+        player = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, this);
         drawables.add(player);
         movables.add(player);
+        localPlayers.add(player);
         frameReference = player;
 
-        GameController controller2 = new GameController(KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_0, KeyEvent.VK_9, KeyEvent.VK_SHIFT, KeyEvent.VK_8);
-        this.addKeyListener(controller2);
-        player2 = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2 + 40, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, controller2, this);
+        
+        player2 = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2 + 40, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, this);
         drawables.add(player2);
         movables.add(player2);
-
-        timer = new Timer(25, this);
-        timer.start();
-    }
-
-    public void paintComponent(Graphics g)
-    {
-        super.paintComponent(g);
-        for (Drawable drawMe : drawables)
-        {
-            if (drawMe.isOnScreen())
-            {
-                drawMe.draw(g);
-            }
-        }
+        localPlayers.add(player2);
+        
     }
 
     // Always a timer event
-    public void actionPerformed(ActionEvent e)
+    public void run()
     {
 
         // System.out.println("drawables: " + drawables.size() + " movables: " +
@@ -126,8 +111,7 @@ public class GameContent extends JPanel implements ActionListener
             movable.update();
         }
 
-        
-        //Check collisions
+        // Check collisions
 
         for (Drawable drawable : drawables)
         {
@@ -156,7 +140,6 @@ public class GameContent extends JPanel implements ActionListener
         player2.ddy = 1;
 
         adjustFrameIfNecessary();
-        repaint();
     }
 
     public void addOrRemoveQueuedElements()
@@ -201,13 +184,7 @@ public class GameContent extends JPanel implements ActionListener
         frameReference = (frameReference == player ? player2 : player);
     }
 
-    public void toggleTimerSpeed()
-    {
-        if (timer.getDelay() == 25) timer.setDelay(500);
-        else timer.setDelay(25);
-    }
-
-    List<SolidRectangle> solidRectanglesInArea(Rectangle rectangle)
+    List<SolidRectangle> findSolidRectanglesInArea(Rectangle rectangle)
     {
         List<SolidRectangle> rectangles = new ArrayList<SolidRectangle>();
         for (Drawable drawable : drawables)
@@ -221,7 +198,19 @@ public class GameContent extends JPanel implements ActionListener
             }
         }
         return rectangles;
+    }
 
+    List<LocalPlayer> findPlayersInArea(Rectangle rectangle)
+    {
+        ArrayList<LocalPlayer> inArea = new ArrayList<LocalPlayer>();
+        for (LocalPlayer player : localPlayers)
+        {
+            if (rectangle.intersects(player.toRectangle()))
+            {
+                inArea.add(player);
+            }
+        }
+        return inArea;
     }
 
     private static int calculateShift(int gameDimension, int referenceDimension)
@@ -243,6 +232,27 @@ public class GameContent extends JPanel implements ActionListener
     public synchronized void addMovable(Movable movable)
     {
         addMovableQueue.add(movable);
+    }
+
+    public synchronized byte[] getSaveState()
+    {
+        try
+        {
+            byte[] save;
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//          FileOutputStream fileOut = new FileOutputStream("GameContent.ser");
+            ObjectOutputStream out = new ObjectOutputStream(stream);
+            out.writeObject(this);
+            save = stream.toByteArray();
+            out.close();
+            stream.close();
+            return save;
+        }
+        catch (IOException i)
+        {
+            i.printStackTrace();
+            return null;
+        }
     }
 
 }

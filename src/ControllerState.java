@@ -1,4 +1,6 @@
-public class ControllerState
+import java.io.Serializable;
+
+public class ControllerState implements Serializable
 {
     boolean left;
     boolean right;
