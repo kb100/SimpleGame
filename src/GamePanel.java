@@ -6,6 +6,8 @@ import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -25,7 +27,7 @@ public class GamePanel extends JPanel implements ActionListener
         this.setBackground(Color.BLACK);
 
         save = null;
-        
+
         game = new GameContent(this);
 
         controller = new GameController();
@@ -43,6 +45,7 @@ public class GamePanel extends JPanel implements ActionListener
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+
         for (Drawable drawMe : game.drawables)
         {
             if (drawMe.isOnScreen())
@@ -50,12 +53,14 @@ public class GamePanel extends JPanel implements ActionListener
                 drawMe.draw(g);
             }
         }
-    }
 
-    public synchronized void actionPerformed(ActionEvent e)
+        }
+
+    public void actionPerformed(ActionEvent e)
     {
         game.run();
         repaint();
+
     }
 
     public void toggleTimerSpeed()
@@ -68,9 +73,9 @@ public class GamePanel extends JPanel implements ActionListener
     {
         try
         {
-//            FileInputStream fileIn = new FileInputStream("GameContent.ser");
-            if(save == null) return;
-            
+            // FileInputStream fileIn = new FileInputStream("GameContent.ser");
+            if (save == null) return;
+
             ByteArrayInputStream stream = new ByteArrayInputStream(save);
             ObjectInputStream in = new ObjectInputStream(stream);
             game = (GameContent) in.readObject();
@@ -93,7 +98,7 @@ public class GamePanel extends JPanel implements ActionListener
             game = new GameContent(this);
         }
     }
-    
+
     public synchronized void setSaveState()
     {
         save = game.getSaveState();

@@ -1,6 +1,6 @@
 import java.awt.Color;
 
-public class Snowflake extends VanishingSolidRectangle
+public class Snowflake extends SolidRectangle
 {
     int age;
 
@@ -25,7 +25,7 @@ public class Snowflake extends VanishingSolidRectangle
     public void decay()
     {
         age++;
-        color = new Color(color.getRed()-5, color.getGreen()-5, color.getBlue()-5);
+        color = new Color(color.getRed() - 5, color.getGreen() - 5, color.getBlue() - 5);
         if (age == 10)
         {
             remove();

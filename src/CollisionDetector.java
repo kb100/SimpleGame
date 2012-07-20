@@ -12,6 +12,11 @@ public class CollisionDetector
         return rectangle.intersects(solidRectangle.toRectangle());
     }
     
+    public static boolean areColliding(SolidRectangle rectangle, SolidRectangle rectangle2)
+    {
+        return (rectangle.toRectangle()).intersects(rectangle2.toRectangle());
+    }
+    
     public static boolean areColliding(LocalPlayer player, LocalPlayer player2)
     {
         return player.toRectangle().intersects(player2.toRectangle());
