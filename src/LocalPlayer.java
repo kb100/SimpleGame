@@ -5,25 +5,36 @@ import java.awt.Rectangle;
 //Does not extend SolidRectangle on purpose
 public class LocalPlayer extends Movable
 {
-
+    
     int width, height;
     boolean crouching;
     int crouchingHeightChange;
+    int disabledTime;
 
     Color color;
 
     GameController controller;
 
+    static
+    {
+        CollisionHandler.registerCollisions(LocalPlayer.class, LocalPlayer.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, SolidRectangle.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, VanishingSolidRectangle.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, Snowflake.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, LandMine.class);
+    }
+    
     public LocalPlayer(int x, int y, int width, int height, GameContent game)
     {
         super(x, y, 8, 18, game);
         this.width = width;
-        this.height =  height;
+        this.height = height;
 
         this.color = Color.WHITE;
 
         this.crouching = false;
-        crouchingHeightChange = (int)(height*.3);
+        crouchingHeightChange = (int) (height * .3);
+        disabledTime = 0;
 
     }
 
@@ -34,24 +45,26 @@ public class LocalPlayer extends Movable
         {
             controller.hasBeenHandled(controller.keyExit);
             game.panel.loadSavedState();
-//            game.saveState();
-//            System.exit(0);
+            // game.saveState();
+            // System.exit(0);
         }
 
         if (state.select)
         {
             game.toggleReferenceFrame();
             controller.hasBeenHandled(controller.keySelect);
-            
+
         }
 
         // Slow motion for debugging purposes
         if (state.start)
         {
-//            game.panel.toggleTimerSpeed();
+            // game.panel.toggleTimerSpeed();
             controller.hasBeenHandled(controller.keyStart);
             game.panel.setSaveState();
         }
+
+        if (disabledTime > 0) return;
 
         if (state.left) ddx = -1;
         else if (state.right) ddx = 1;
@@ -82,12 +95,15 @@ public class LocalPlayer extends Movable
     public void update()
     {
         super.update();
+        if (disabledTime > 0) disabledTime--;
+        if(disabledTime == 0) color = Color.white;
         if (turning()) dx /= 2;
     }
 
     public boolean turning()
     {
-        return dx * ddx <= 0;
+        
+        return (dx * ddx <= 0);
     }
 
     public boolean roomToUncrouch()
@@ -98,6 +114,14 @@ public class LocalPlayer extends Movable
     public void jump()
     {
         dy = -10;
+    }
+
+    public void disable(int time)
+    {
+        disabledTime += time;
+        ddx = 0;
+        ddy = 0;
+        color = Color.LIGHT_GRAY;
     }
 
     public void land()

@@ -1,6 +1,7 @@
+
 public abstract class Movable extends Drawable
 {
-    
+
     int dx, ddx;
     int dy, ddy;
 
@@ -14,10 +15,9 @@ public abstract class Movable extends Drawable
         this.dyMax = dyMax;
         stop();
     }
-    
 
     public abstract void control();
-    
+
     public void update()
     {
         x += dx;
@@ -35,5 +35,5 @@ public abstract class Movable extends Drawable
     {
         dx = ddx = dy = ddy = 0;
     }
-    
+
 }

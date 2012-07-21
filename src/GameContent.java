@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-@SuppressWarnings("serial")
 public class GameContent implements Serializable
 {
 
@@ -34,8 +33,8 @@ public class GameContent implements Serializable
     }
 
     transient GamePanel panel;
-    
-    GameContent savedState; 
+
+    GameContent savedState;
     LocalPlayer player;
     LocalPlayer player2;
 
@@ -43,6 +42,7 @@ public class GameContent implements Serializable
 
     SolidRectangle floor;
     SnowflakeSource snowflakeSource;
+    LandMine mine;
 
     // TODO: Keep sorted by order should be painted back to front
     List<LocalPlayer> localPlayers;
@@ -76,25 +76,24 @@ public class GameContent implements Serializable
             drawables.add(new SolidRectangle(rand.nextInt(20000) - 10000, rand.nextInt(20000) - 10000, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
             drawables.add(new VanishingSolidRectangle(rand.nextInt(20000) - 10000, rand.nextInt(20000) - 10000, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
         }
-
+        
+        mine = new LandMine(500,50,this);
+        addMovable(mine);
+        
         player = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, this);
-        drawables.add(player);
-        movables.add(player);
+        addMovable(player);
         localPlayers.add(player);
         frameReference = player;
 
-        
         player2 = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2 + 40, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, this);
-        drawables.add(player2);
-        movables.add(player2);
+        addMovable(player2);
         localPlayers.add(player2);
-        
+
     }
 
-    // Always a timer event
     public void run()
     {
-
+        //
         // System.out.println("drawables: " + drawables.size() + " movables: " +
         // movables.size() + " addDrawableQueue: " + addDrawableQueue.size() +
         // " addMovableQueue: " + addMovableQueue.size() + " removeQueue: " +
@@ -110,23 +109,46 @@ public class GameContent implements Serializable
             movable.control();
             movable.update();
         }
-
-        // Check collisions
-
+        
+//        // Check collisions
+//        int size = drawables.size();
+//        for(int i = 0; i < size; ++i)
+//        {
+//            for(int j = i+1; j < size; ++j)
+//            {
+//                Drawable drawable = drawables.get(i);
+//                Drawable drawable2 = drawables.get(j);
+//                if(CollisionDetector.areColliding(drawable.getClass().cast(drawable), drawable2.getClass().cast(drawable2)))
+//                {
+//                    
+//                }
+//            }
+//        }
+        
+        
+        
+        
+        
+        
         for (Drawable drawable : drawables)
         {
-
             if (drawable instanceof SolidRectangle)
             {
-                if (drawable != player && CollisionDetector.areColliding(player, (SolidRectangle) drawable))
+                if (CollisionDetector.areColliding(player, (SolidRectangle) drawable))
                 {
                     CollisionHandler.handleCollision(player, (SolidRectangle) drawable);
                 }
 
-                if (drawable != player2 && CollisionDetector.areColliding(player2, (SolidRectangle) drawable))
+                if (CollisionDetector.areColliding(player2, (SolidRectangle) drawable))
                 {
                     CollisionHandler.handleCollision(player2, (SolidRectangle) drawable);
                 }
+                
+                if(CollisionDetector.areColliding(mine, (SolidRectangle)drawable))
+                {
+                    CollisionHandler.handleCollision(mine, (SolidRectangle)drawable);
+                }
+                
             }
         }
 
@@ -181,7 +203,9 @@ public class GameContent implements Serializable
 
     public void toggleReferenceFrame()
     {
-        frameReference = (frameReference == player ? player2 : player);
+        if(frameReference == player) frameReference = player2;
+        else if(frameReference == player2) frameReference = mine;
+        else if (frameReference == mine) frameReference = player;
     }
 
     List<SolidRectangle> findSolidRectanglesInArea(Rectangle rectangle)
@@ -240,7 +264,8 @@ public class GameContent implements Serializable
         {
             byte[] save;
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//          FileOutputStream fileOut = new FileOutputStream("GameContent.ser");
+            // FileOutputStream fileOut = new
+            // FileOutputStream("GameContent.ser");
             ObjectOutputStream out = new ObjectOutputStream(stream);
             out.writeObject(this);
             save = stream.toByteArray();
