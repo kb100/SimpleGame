@@ -21,6 +21,11 @@ public class CollisionDetector
                 rectangle1.y < rectangle2.y+rectangle2.height && rectangle1.y+rectangle1.height > rectangle2.y);
     }
     
+    public static boolean areColliding(SolidRectangle rectangle, SolidRectangle rectangle2)
+    {
+        return (rectangle.toRectangle()).intersects(rectangle2.toRectangle());
+    }
+    
     public static boolean areColliding(LocalPlayer player, LocalPlayer player2)
     {
         return (player.x < player2.x+player2.width && player.x+player.width > player2.x &&
