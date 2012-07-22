@@ -1,12 +1,12 @@
 import java.awt.Graphics;
 
 
-public abstract class Source<T extends Movable> extends Drawable
+public abstract class Source<T extends Movable> extends Movable
 {
 
     public Source(int x, int y, GameContent game)
     {
-        super(x, y, game);
+        super(x, y, Integer.MAX_VALUE, Integer.MAX_VALUE, game);
     }
 
 
@@ -17,4 +17,9 @@ public abstract class Source<T extends Movable> extends Drawable
     }
 
     public abstract void produceMovable();
+    
+    public void control()
+    {
+        produceMovable();
+    }
 }

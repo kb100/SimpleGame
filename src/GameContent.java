@@ -22,8 +22,8 @@ public class GameContent implements Serializable
 
     static final int PLAYER_HEIGHT = 50;
     static final int PLAYER_WIDTH = 25;
-    static final int NUM_PLATFORMS = 5000;
-    static final int FLAKES_PER_FRAME = 1;
+    static final int NUM_PLATFORMS = 100;
+    static final int FLAKES_PER_FRAME = 10;
 
     static Random rand = new Random();
 
@@ -66,6 +66,7 @@ public class GameContent implements Serializable
 
         snowflakeSource = new SnowflakeSource(GAME_WIDTH / 2, 0, this);
         drawables.add(snowflakeSource);
+        movables.add(snowflakeSource);
 
         floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
         drawables.add(floor);
@@ -73,11 +74,11 @@ public class GameContent implements Serializable
         for (int i = 0; i < NUM_PLATFORMS; i++)
         {
 
-            drawables.add(new SolidRectangle(rand.nextInt(20000) - 10000, rand.nextInt(20000) - 10000, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
-            drawables.add(new VanishingSolidRectangle(rand.nextInt(20000) - 10000, rand.nextInt(20000) - 10000, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            drawables.add(new SolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            drawables.add(new VanishingSolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
         }
         
-        mine = new LandMine(500,50,this);
+        mine = new LandMine(700,50,this);
         addMovable(mine);
         
         player = new LocalPlayer((GAME_WIDTH - PLAYER_WIDTH) / 2, (GAME_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, this);
@@ -98,10 +99,7 @@ public class GameContent implements Serializable
         // movables.size() + " addDrawableQueue: " + addDrawableQueue.size() +
         // " addMovableQueue: " + addMovableQueue.size() + " removeQueue: " +
         // removeQueue.size());
-        for (int i = 0; i < FLAKES_PER_FRAME; i++)
-        {
-            snowflakeSource.produceMovable();
-        }
+      
         addOrRemoveQueuedElements();
 
         for (Movable movable : movables)
@@ -110,7 +108,7 @@ public class GameContent implements Serializable
             movable.update();
         }
         
-//        // Check collisions
+        // Check collisions
 //        int size = drawables.size();
 //        for(int i = 0; i < size; ++i)
 //        {
@@ -118,16 +116,12 @@ public class GameContent implements Serializable
 //            {
 //                Drawable drawable = drawables.get(i);
 //                Drawable drawable2 = drawables.get(j);
-//                if(CollisionDetector.areColliding(drawable.getClass().cast(drawable), drawable2.getClass().cast(drawable2)))
+//                if(CollisionDetector.areColliding(drawable, drawable2))
 //                {
-//                    
+//                    CollisionHandler.handleCollision(drawable, drawable2);
 //                }
 //            }
 //        }
-        
-        
-        
-        
         
         
         for (Drawable drawable : drawables)
@@ -213,7 +207,7 @@ public class GameContent implements Serializable
         List<SolidRectangle> rectangles = new ArrayList<SolidRectangle>();
         for (Drawable drawable : drawables)
         {
-            if (drawable instanceof SolidRectangle && !(drawable instanceof Snowflake))
+            if (drawable instanceof SolidRectangle)
             {
                 if (rectangle.intersects(((SolidRectangle) drawable).toRectangle()))
                 {

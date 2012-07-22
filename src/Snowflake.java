@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Graphics;
 
 public class Snowflake extends SolidRectangle
 {
@@ -42,5 +43,5 @@ public class Snowflake extends SolidRectangle
         int n = GameContent.rand.nextInt(56) + 200;
         return new Color(n, n, n);
     }
-
+    
 }

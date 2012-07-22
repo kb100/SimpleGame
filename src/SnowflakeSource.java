@@ -12,4 +12,5 @@ public class SnowflakeSource extends Source<Snowflake>
         game.addMovable(new Snowflake(x, y, game));
     }
 
+
 }

@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.List;
 
 //Does not extend SolidRectangle on purpose
 public class LocalPlayer extends Movable
@@ -10,6 +11,7 @@ public class LocalPlayer extends Movable
     boolean crouching;
     int crouchingHeightChange;
     int disabledTime;
+    ExplosionParticleSource source;
 
     Color color;
 
@@ -29,6 +31,8 @@ public class LocalPlayer extends Movable
         super(x, y, 8, 18, game);
         this.width = width;
         this.height = height;
+        
+        source = new ExplosionParticleSource(x, y, game);
 
         this.color = Color.WHITE;
 
@@ -98,17 +102,25 @@ public class LocalPlayer extends Movable
         if (disabledTime > 0) disabledTime--;
         if(disabledTime == 0) color = Color.white;
         if (turning()) dx /= 2;
+        
+        source.x = x+width/2;
+        source.y = y - 5;
+        source.produceMovable();
     }
 
     public boolean turning()
     {
-        
-        return (dx * ddx <= 0);
+        return (dx * ddx <= 0) && (disabledTime == 0);
     }
 
     public boolean roomToUncrouch()
     {
-        return game.findSolidRectanglesInArea(new Rectangle(x, y - crouchingHeightChange, width, height)).isEmpty();
+        List<SolidRectangle> rectangles = game.findSolidRectanglesInArea(new Rectangle(x, y - crouchingHeightChange, width, height));
+        for(SolidRectangle rectangle : rectangles)
+        {
+            if(CollisionHandler.isValidCollision(this, rectangle));
+        }
+        return true; 
     }
 
     public void jump()

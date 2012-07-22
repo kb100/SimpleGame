@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class CollisionHandler
 {
     static HashMap<Class<?>, HashSet<Class<?>>> intersections = new HashMap<Class<?>, HashSet<Class<?>>>();
-
+    
     public static void registerCollisions(Class<?> clazz, Class<?> clazz2)
     {
         HashSet<Class<?>> bucket = intersections.get(clazz);
@@ -25,7 +25,6 @@ public class CollisionHandler
             intersections.put(clazz2, bucket);
         }
         bucket.add(clazz);
-        // System.out.println("Added: <" + clazz + ", " + clazz2 + ">");
     }
 
     public static boolean isValidCollision(Object object, Object object2)
@@ -63,6 +62,11 @@ public class CollisionHandler
         }
     }
 
+    public static void handleCollision(SolidRectangle rectangle, LocalPlayer player)
+    {
+        handleCollision(player, rectangle);
+    }
+    
     public static void handleCollision(LocalPlayer player, SolidRectangle rectangle)
     {
         if (!isValidCollision(player, rectangle)) return;
