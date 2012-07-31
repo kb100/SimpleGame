@@ -19,7 +19,7 @@ public class Snowflake extends SolidRectangle
     {
         dx += GameContent.rand.nextInt( 3 ) - 1;
         dy += GameContent.rand.nextInt( 4 ) - 2;
-        if( GameContent.rand.nextInt( 50 ) == 0 )
+        if( GameContent.rand.nextInt( 32 ) == 0 )
             decay();
 
     }

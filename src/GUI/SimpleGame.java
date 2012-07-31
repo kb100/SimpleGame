@@ -10,7 +10,7 @@ import javax.swing.JApplet;
 public class SimpleGame extends JApplet
 {
     GamePanel panel;
-
+    
     public void init()
     {
         this.setSize( GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT );

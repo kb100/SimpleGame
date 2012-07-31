@@ -1,13 +1,16 @@
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class QuadTree
 {
     static final int MAX_LEVEL = 6;
     private Node root;
+    public ArrayList<ArrayList<Drawable>> leaves;
 
     public QuadTree()
     {
+        leaves = new ArrayList<ArrayList<Drawable>>(1024);
         root = new Node( 0, GameContent.GAME_WIDTH, 0, GameContent.GAME_HEIGHT, 0 );
     }
 
@@ -35,8 +38,8 @@ public class QuadTree
         }
         return drawables;
     }
-
-    private static class Node
+  
+    private class Node
     {
         int level;
         int xMin, xMax;
@@ -66,13 +69,19 @@ public class QuadTree
                 // speed consideration
                 // only the leaves have non-null arraylists
                 drawablesInRegion = new ArrayList< Drawable >();
+                leaves.add( drawablesInRegion );
             }
+        }
+
+        public boolean isLeaf()
+        {
+            return this.lowerLeft == null;
         }
 
         // Assumes it intersects the root
         public void addDrawablesInRegion( Rectangle region, ArrayList< Drawable > drawables )
         {
-            if( upperLeft == null )
+            if( this.isLeaf() )
             {
                 drawables.addAll( drawablesInRegion );
             }
@@ -93,7 +102,7 @@ public class QuadTree
         // Assumes it intersects the root
         public void addDrawablesInRegion( Drawable region, ArrayList< Drawable > drawables )
         {
-            if( upperLeft == null )
+            if( this.isLeaf() )
             {
                 drawables.addAll( drawablesInRegion );
             }
@@ -113,19 +122,26 @@ public class QuadTree
 
         public void add( Drawable drawable )
         {
-            if( this.intersectsDrawable( drawable ) )
+            LinkedList< Node > queue = new LinkedList< Node >();
+            queue.add( this );
+            Node current;
+            while( queue.size() > 0 )
             {
-                if( upperLeft != null )
+                current = queue.poll();
+                if( current.intersectsDrawable( drawable ) )
                 {
-                    upperLeft.add( drawable );
-                    upperRight.add( drawable );
-                    lowerLeft.add( drawable );
-                    lowerRight.add( drawable );
-                }
-                else
-                {
-                    // only leaves have non-null arraylists
-                    drawablesInRegion.add( drawable );
+                    if( !current.isLeaf() )
+                    {
+                        queue.add( current.upperLeft );
+                        queue.add( current.upperRight );
+                        queue.add( current.lowerLeft );
+                        queue.add( current.lowerRight );
+                    }
+                    else
+                    {
+                        // only leaves have non-null arraylists
+                        current.drawablesInRegion.add( drawable );
+                    }
                 }
             }
         }

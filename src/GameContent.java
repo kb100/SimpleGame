@@ -3,11 +3,11 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -90,11 +90,11 @@ public class GameContent implements Serializable
     public void run()
     {
 
-        //
-        // System.out.println("drawables: " + drawables.size() + " movables: " +
-        // movables.size() + " addDrawableQueue: " + addDrawableQueue.size() +
-        // " addMovableQueue: " + addMovableQueue.size() + " removeQueue: " +
-        // removeQueue.size());
+        
+//         System.out.println("drawables: " + drawables.size() + " movables: " +
+//         movables.size() + " addDrawableQueue: " + addDrawableQueue.size() +
+//         " addMovableQueue: " + addMovableQueue.size() + " removeQueue: " +
+//         removeQueue.size());
 
         addOrRemoveQueuedElements();
 
@@ -103,24 +103,45 @@ public class GameContent implements Serializable
             movable.control();
             movable.update();
         }
+        
         QuadTree tree = new QuadTree();
         for(Drawable drawable : drawables)
         {
             tree.add( drawable );
         }
 
-        ArrayList<Drawable> collisions = new ArrayList<Drawable>();
-        for(Drawable drawable : drawables)
+        
+        for(ArrayList<Drawable> possibleCollisions : tree.leaves)
         {
-            collisions = tree.getDrawablesIntersecting( drawable );
-            for(Drawable collidee : collisions)
+            int size = possibleCollisions.size();
+            for(int i = 0; i < size; ++i)
             {
-                if( CollisionDetector.areColliding( drawable, collidee ) )
-                  {
-                      CollisionHandler.handleCollision( drawable, collidee );
-                  }
+                for(int j = i+1; j < size; ++j)
+                {
+                    Drawable drawable1 = possibleCollisions.get(i);
+                    Drawable drawable2 = possibleCollisions.get(j);
+                    
+                    if(CollisionDetector.areColliding( drawable1, drawable2 ))
+                    {
+                        CollisionHandler.handleCollision( drawable1, drawable2 );
+                    }
+                }
             }
         }
+        
+        
+//        ArrayList<Drawable> collisions = new ArrayList<Drawable>();
+//        for(Drawable drawable : drawables)
+//        {
+//            collisions = tree.getDrawablesIntersecting( drawable );
+//            for(Drawable collidee : collisions)
+//            {
+//                if( CollisionDetector.areColliding( drawable, collidee ) )
+//                  {
+//                      CollisionHandler.handleCollision( drawable, collidee );
+//                  }
+//            }
+//        }
         
 //        // Check collisions
 //        int size = drawables.size();
@@ -136,10 +157,6 @@ public class GameContent implements Serializable
 //                }
 //            }
 //        }
-
-        // gravity
-        player.ddy = 1;
-        player2.ddy = 1;
 
         adjustFrameIfNecessary();
     }

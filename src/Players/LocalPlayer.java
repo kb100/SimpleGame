@@ -51,7 +51,6 @@ public class LocalPlayer extends Movable
         {
             game.toggleReferenceFrame();
             controller.hasBeenHandled( controller.keySelect );
-
         }
 
         // Slow motion for debugging purposes
@@ -62,6 +61,7 @@ public class LocalPlayer extends Movable
             game.panel.setSaveState();
         }
 
+        ddy = 1;
         if( disabledTime > 0 )
             return;
 
@@ -92,6 +92,7 @@ public class LocalPlayer extends Movable
 
         if( state.jump )
             jump();
+        
     }
 
     public void update()
