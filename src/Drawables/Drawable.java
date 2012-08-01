@@ -8,7 +8,7 @@ public abstract class Drawable implements Serializable
     int width, height;
     GameContent game;
 
-    public Drawable( int x, int y, int width, int height, GameContent game )
+    public Drawable(int x, int y, int width, int height, GameContent game)
     {
         this.x = x;
         this.y = y;
@@ -17,7 +17,7 @@ public abstract class Drawable implements Serializable
         this.game = game;
     }
 
-    public void unconditionalShift( int dx, int dy )
+    public void unconditionalShift(int dx, int dy)
     {
         x += dx;
         y += dy;
@@ -25,15 +25,15 @@ public abstract class Drawable implements Serializable
 
     public Rectangle getBoundingRectangle()
     {
-        return new Rectangle( x, y, width, height );
+        return new Rectangle(x, y, width, height);
     }
 
     public void remove()
     {
-        game.remove( this );
+        game.remove(this);
     }
 
-    public abstract void draw( Graphics g );
+    public abstract void draw(Graphics g);
 
     public boolean isOnScreen()
     {

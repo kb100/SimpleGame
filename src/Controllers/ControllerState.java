@@ -16,7 +16,7 @@ public class ControllerState implements Serializable
         left = right = up = down = start = select = jump = false;
     }
 
-    public ControllerState( ControllerState other )
+    public ControllerState(ControllerState other)
     {
         left = other.left;
         right = other.right;

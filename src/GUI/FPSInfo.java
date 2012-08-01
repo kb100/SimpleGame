@@ -1,18 +1,21 @@
+import java.util.LinkedList;
+
 public class FPSInfo
 {
-    private static long lastTime = System.nanoTime();
+    private static LinkedList<Long> times = new LinkedList<Long>();
+    private static final int FRAMES = 20;
 
     private static long getNanosSinceLastUpdate()
     {
-        long currentTime = System.nanoTime();
-        long difference = currentTime - lastTime;
-        lastTime = currentTime;
-        return difference;
+        times.add(System.nanoTime());
+        if(times.size() > FRAMES)
+            times.poll();
+        return times.getLast() - times.getFirst();
     }
 
     public static double getFPS()
     {
         long nanos = getNanosSinceLastUpdate();
-        return 1_000_000_000d / nanos;
+        return FRAMES * 1_000_000_000d / nanos;
     }
 }

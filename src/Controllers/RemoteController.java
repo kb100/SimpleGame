@@ -12,15 +12,15 @@ public class RemoteController implements Controller
     {
         ControllerState state;
 
-        while( bufferedState == null )
+        while(bufferedState == null)
         {
             try
             {
                 wait();
             }
-            catch( InterruptedException e )
+            catch(InterruptedException e)
             {
-                System.out.println( "interrupt" );
+                System.out.println("interrupt");
             }
         }
         state = bufferedState;

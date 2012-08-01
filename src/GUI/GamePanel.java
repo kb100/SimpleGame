@@ -22,44 +22,49 @@ public class GamePanel extends JPanel implements ActionListener
 
     public GamePanel()
     {
-        this.setSize( GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT );
-        this.setBackground( Color.BLACK );
-        this.setDoubleBuffered( true );
+        this.setSize(GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT);
+        this.setBackground(Color.BLACK);
+        this.setDoubleBuffered(true);
 
         save = null;
 
-        game = new GameContent( this );
+        game = new GameContent(this);
 
         controller = new GameController();
-        this.addKeyListener( controller );
+        this.addKeyListener(controller);
         game.player.controller = controller;
 
-        controller2 = new GameController( KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_0, KeyEvent.VK_9, KeyEvent.VK_SHIFT, KeyEvent.VK_8 );
-        this.addKeyListener( controller2 );
+        controller2 = new GameController(KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_0, KeyEvent.VK_9, KeyEvent.VK_SHIFT, KeyEvent.VK_8);
+        this.addKeyListener(controller2);
         game.player2.controller = controller2;
 
-        timer = new Timer( 25, this );
+        timer = new Timer(25, this);
         timer.start();
     }
 
-    public void paintComponent( Graphics g )
+    public void paintComponent(Graphics g)
     {
-        super.paintComponent( g );
+        super.paintComponent(g);
 
-        for( Drawable drawMe : game.drawables )
+        for(Drawable drawMe : game.drawables)
         {
-            if( drawMe.isOnScreen() )
+            if(drawMe.isOnScreen())
             {
-                drawMe.draw( g );
+                drawMe.draw(g);
             }
         }
 
-        g.setColor( Color.green );
-        g.drawString( "FPS: " + FPSInfo.getFPS(), 10, 15 );
+        g.setColor(Color.green);
+        g.drawString("FPS: " + FPSInfo.getFPS(), 10, 15);
+        g.drawString("drawables: " + game.drawables.size(), 10, 30);
+        g.drawString("movables: " + game.movables.size(), 10, 45);
+        g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
+        
+        game.tree.draw(g);
 
     }
 
-    public void actionPerformed( ActionEvent e )
+    public void actionPerformed(ActionEvent e)
     {
         game.run();
         repaint();
@@ -67,9 +72,9 @@ public class GamePanel extends JPanel implements ActionListener
 
     public void toggleTimerSpeed()
     {
-        if( timer.getDelay() == 25 )
-            timer.setDelay( 500 );
-        else timer.setDelay( 25 );
+        if(timer.getDelay() == 25)
+            timer.setDelay(500);
+        else timer.setDelay(25);
     }
 
     public synchronized void loadSavedState()
@@ -77,29 +82,29 @@ public class GamePanel extends JPanel implements ActionListener
         try
         {
             // FileInputStream fileIn = new FileInputStream("GameContent.ser");
-            if( save == null )
+            if(save == null)
                 return;
 
-            ByteArrayInputStream stream = new ByteArrayInputStream( save );
-            ObjectInputStream in = new ObjectInputStream( stream );
-            game = (GameContent) in.readObject();
+            ByteArrayInputStream stream = new ByteArrayInputStream(save);
+            ObjectInputStream in = new ObjectInputStream(stream);
+            game = (GameContent)in.readObject();
             game.panel = this;
             game.player.controller = controller;
             game.player2.controller = controller2;
             in.close();
             stream.close();
         }
-        catch( IOException i )
+        catch(IOException i)
         {
             // i.printStackTrace();
-            game = new GameContent( this );
-            System.out.println( "io" );
+            game = new GameContent(this);
+            System.out.println("io");
         }
-        catch( ClassNotFoundException c )
+        catch(ClassNotFoundException c)
         {
-            System.out.println( "class not found" );
+            System.out.println("class not found");
             c.printStackTrace();
-            game = new GameContent( this );
+            game = new GameContent(this);
         }
     }
 

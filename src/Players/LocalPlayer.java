@@ -17,21 +17,21 @@ public class LocalPlayer extends Movable
 
     static
     {
-        CollisionHandler.registerCollisions( LocalPlayer.class, LocalPlayer.class );
-        CollisionHandler.registerCollisions( LocalPlayer.class, SolidRectangle.class );
-        CollisionHandler.registerCollisions( LocalPlayer.class, VanishingSolidRectangle.class );
-        CollisionHandler.registerCollisions( LocalPlayer.class, Snowflake.class );
-        CollisionHandler.registerCollisions( LocalPlayer.class, LandMine.class );
+        CollisionHandler.registerCollisions(LocalPlayer.class, LocalPlayer.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, SolidRectangle.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, VanishingSolidRectangle.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, Snowflake.class);
+        CollisionHandler.registerCollisions(LocalPlayer.class, LandMine.class);
     }
 
-    public LocalPlayer( int x, int y, int width, int height, GameContent game )
+    public LocalPlayer(int x, int y, int width, int height, GameContent game)
     {
-        super( x, y, width, height, 8, 18, game );
+        super(x, y, width, height, 8, 18, game);
 
         this.color = Color.WHITE;
 
         this.crouching = false;
-        crouchingHeightChange = (int) (height * .3);
+        crouchingHeightChange = (int)(height * .3);
         disabledTime = 0;
 
     }
@@ -39,41 +39,41 @@ public class LocalPlayer extends Movable
     public void control()
     {
         ControllerState state = controller.getControllerState();
-        if( state.exit )
+        if(state.exit)
         {
-            controller.hasBeenHandled( controller.keyExit );
+            controller.hasBeenHandled(controller.keyExit);
             game.panel.loadSavedState();
             // game.saveState();
             // System.exit(0);
         }
 
-        if( state.select )
+        if(state.select)
         {
             game.toggleReferenceFrame();
-            controller.hasBeenHandled( controller.keySelect );
+            controller.hasBeenHandled(controller.keySelect);
         }
 
         // Slow motion for debugging purposes
-        if( state.start )
+        if(state.start)
         {
             // game.panel.toggleTimerSpeed();
-            controller.hasBeenHandled( controller.keyStart );
+            controller.hasBeenHandled(controller.keyStart);
             game.panel.setSaveState();
         }
 
         ddy = 1;
-        if( disabledTime > 0 )
+        if(disabledTime > 0)
             return;
 
-        if( state.left )
+        if(state.left)
             ddx = -1;
-        else if( state.right )
+        else if(state.right)
             ddx = 1;
         else ddx = 0;
 
-        if( state.down )
+        if(state.down)
         {
-            if( !crouching )
+            if(!crouching)
             {
                 height -= crouchingHeightChange;
                 y += crouchingHeightChange;
@@ -82,7 +82,7 @@ public class LocalPlayer extends Movable
         }
         else
         {
-            if( crouching && roomToUncrouch() )
+            if(crouching && roomToUncrouch())
             {
                 y -= crouchingHeightChange;
                 height += crouchingHeightChange;
@@ -90,19 +90,19 @@ public class LocalPlayer extends Movable
             }
         }
 
-        if( state.jump )
+        if(state.jump)
             jump();
-        
+
     }
 
     public void update()
     {
         super.update();
-        if( disabledTime > 0 )
+        if(disabledTime > 0)
             disabledTime--;
-        if( disabledTime == 0 )
+        if(disabledTime == 0)
             color = Color.white;
-        if( turning() )
+        if(turning())
             dx /= 2;
 
     }
@@ -114,10 +114,10 @@ public class LocalPlayer extends Movable
 
     public boolean roomToUncrouch()
     {
-        List< SolidRectangle > rectangles = game.findSolidRectanglesInArea( new Rectangle( x, y - crouchingHeightChange, width, height ) );
-        for( SolidRectangle rectangle : rectangles )
+        List<SolidRectangle> rectangles = game.findSolidRectanglesInArea(new Rectangle(x, y - crouchingHeightChange, width, height));
+        for(SolidRectangle rectangle : rectangles)
         {
-            if( CollisionHandler.isValidCollision( this, rectangle )  && !(rectangle instanceof Snowflake))
+            if(CollisionHandler.isValidCollision(this, rectangle) && !(rectangle instanceof Snowflake))
                 return false;
         }
         return true;
@@ -128,7 +128,7 @@ public class LocalPlayer extends Movable
         dy = -10;
     }
 
-    public void disable( int time )
+    public void disable(int time)
     {
         disabledTime += time;
         ddx = 0;
@@ -139,19 +139,19 @@ public class LocalPlayer extends Movable
     public void land()
     {
         dy = ddy = 0;
-        if( disabledTime != 0 )
+        if(disabledTime != 0)
             dx /= 2;
     }
 
-    public void draw( Graphics g )
+    public void draw(Graphics g)
     {
-        g.setColor( color );
-        g.fillRect( x, y, width, height );
+        g.setColor(color);
+        g.fillRect(x, y, width, height);
     }
 
     public Rectangle toRectangle()
     {
-        return new Rectangle( x, y, width, height );
+        return new Rectangle(x, y, width, height);
     }
 
 }
