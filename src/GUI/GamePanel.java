@@ -60,7 +60,7 @@ public class GamePanel extends JPanel implements ActionListener
         g.drawString("movables: " + game.movables.size(), 10, 45);
         g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
         
-        game.tree.draw(g);
+       // game.tree.draw(g);
 
     }
 

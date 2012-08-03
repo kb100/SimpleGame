@@ -1,19 +1,21 @@
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class CollisionHandler
 {
-    static HashMap<Class<?>, HashSet<Class<?>>> intersections = new HashMap<Class<?>, HashSet<Class<?>>>();
+    static THashMap<Class<?>, THashSet<Class<?>>> intersections = new THashMap<Class<?>, THashSet<Class<?>>>();
 
     public static void registerCollisions(Class<?> clazz, Class<?> clazz2)
     {
-        HashSet<Class<?>> bucket = intersections.get(clazz);
+        THashSet<Class<?>> bucket = intersections.get(clazz);
         if(bucket == null)
         {
-            bucket = new HashSet<Class<?>>();
+            bucket = new THashSet<Class<?>>();
             intersections.put(clazz, bucket);
         }
         bucket.add(clazz2);
@@ -21,7 +23,7 @@ public class CollisionHandler
         bucket = intersections.get(clazz2);
         if(bucket == null)
         {
-            bucket = new HashSet<Class<?>>();
+            bucket = new THashSet<Class<?>>();
             intersections.put(clazz2, bucket);
         }
         bucket.add(clazz);
@@ -32,7 +34,7 @@ public class CollisionHandler
         if(object == object2)
             return false;
 
-        HashSet<Class<?>> bucket = intersections.get(object.getClass());
+        THashSet<Class<?>> bucket = intersections.get(object.getClass());
         if(bucket == null || !bucket.contains(object2.getClass()))
             return false;
 

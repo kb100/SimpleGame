@@ -1,49 +1,46 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class QuadTree
+public class QuadTree implements Serializable
 {
-    static final int MAX_LEVEL = 7;
-    static final int BRANCHING_LIMIT = 31;
+    static final int MAX_LEVEL = 9;
+    static final int BRANCHING_LIMIT = 32;
     static final int MAX_NUM_LEAVES = 1 << MAX_LEVEL;
+    static final int WIDTH = GameContent.GAME_WIDTH;
+    static final int HEIGHT = GameContent.GAME_HEIGHT;
+
     private Node root;
-    public ArrayList<ArrayList<Drawable>> leaves;
-    public ArrayList<Node> leafNodes;
+    ArrayList<ArrayList<Drawable>> leaves;
+
+    // ArrayList<Node> leafNodes;
 
     public QuadTree()
     {
         leaves = new ArrayList<ArrayList<Drawable>>(MAX_NUM_LEAVES);
-        leafNodes = new ArrayList<Node>(MAX_NUM_LEAVES);
-        root = new Node(0, GameContent.GAME_WIDTH, 0, GameContent.GAME_HEIGHT, 0);
+        // leafNodes = new ArrayList<Node>(MAX_NUM_LEAVES);
+        root = new Node(0, WIDTH, 0, HEIGHT, 0);
     }
 
     public QuadTree(QuadTree old)
     {
-        leaves = new ArrayList<ArrayList<Drawable>>(old.leaves.size());
-        leafNodes = new ArrayList<Node>(old.leaves.size());
+        leaves = new ArrayList<ArrayList<Drawable>>((int)(old.leaves.size() * 1.2));
+        // leafNodes = new ArrayList<Node>((int)(old.leaves.size() * 1.2));
         root = new Node(0, old.root);
     }
 
-    public void newLeaves()
-    {
-        int size = leaves.size();
-        for(int i = 0; i < size; ++i)
-        {
-            leaves.get(i).clear();
-        }
-    }
-
-    public void draw(Graphics g)
-    {
-        g.setColor(Color.gray);
-        for(Node node : leafNodes)
-        {
-            g.drawRect(node.xMin, node.yMin, node.xMax - node.xMin, node.yMax - node.yMin);
-        }
-    }
+    // public void draw(Graphics g)
+    // {
+    // g.setColor(Color.gray);
+    // for(Node node : leafNodes)
+    // {
+    // g.drawRect(node.xMin, node.yMin, node.xMax - node.xMin, node.yMax -
+    // node.yMin);
+    // }
+    // }
 
     public void add(Drawable drawable)
     {
@@ -70,13 +67,13 @@ public class QuadTree
         return drawables;
     }
 
-    private class Node
+    private class Node implements Serializable
     {
         int level;
         int xMin, xMax;
         int yMin, yMax;
         Node upperLeft, upperRight, lowerLeft, lowerRight;
-        int objectsInRegion;
+        int drawableCount;
         ArrayList<Drawable> drawablesInRegion;
 
         public Node(int xMin, int xMax, int yMin, int yMax, int level)
@@ -87,7 +84,7 @@ public class QuadTree
             this.yMax = yMax;
             this.level = level;
 
-            objectsInRegion = 0;
+            drawableCount = 0;
 
             if(level < MAX_LEVEL)
             {
@@ -105,7 +102,7 @@ public class QuadTree
                 // only the leaves have non-null arraylists
                 drawablesInRegion = new ArrayList<Drawable>();
                 leaves.add(drawablesInRegion);
-                leafNodes.add(this);
+                // leafNodes.add(this);
             }
         }
 
@@ -117,11 +114,11 @@ public class QuadTree
             this.yMax = yMax;
             this.level = stopLevel;
 
-            objectsInRegion = 0;
+            drawableCount = 0;
 
             drawablesInRegion = new ArrayList<Drawable>();
             leaves.add(drawablesInRegion);
-            leafNodes.add(this);
+            // leafNodes.add(this);
         }
 
         public Node(int level, Node oldNode)
@@ -133,9 +130,9 @@ public class QuadTree
             this.yMax = oldNode.yMax;
             this.level = oldNode.level;
 
-            objectsInRegion = 0;
+            drawableCount = 0;
 
-            if(level < MAX_LEVEL && oldNode.objectsInRegion > BRANCHING_LIMIT)
+            if(level < MAX_LEVEL && oldNode.drawableCount > BRANCHING_LIMIT)
             {
                 int nextLevel = level + 1;
                 if(oldNode.isLeaf())
@@ -162,7 +159,7 @@ public class QuadTree
                 // only the leaves have non-null arraylists
                 drawablesInRegion = new ArrayList<Drawable>();
                 leaves.add(drawablesInRegion);
-                leafNodes.add(this);
+                // leafNodes.add(this);
             }
         }
 
@@ -215,15 +212,16 @@ public class QuadTree
 
         public void add(Drawable drawable)
         {
-            LinkedList<Node> queue = new LinkedList<Node>();
+            ArrayList<Node> queue = new ArrayList<Node>(64);
             queue.add(this);
             Node current;
-            while(queue.size() > 0)
+            int lastIndex;
+            while((lastIndex = queue.size()-1) >= 0)
             {
-                current = queue.poll();
+                current = queue.remove(lastIndex);
                 if(current.intersectsDrawable(drawable))
                 {
-                    current.objectsInRegion++;
+                    current.drawableCount++;
                     if(!current.isLeaf())
                     {
                         queue.add(current.upperLeft);

@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class GameContent implements Serializable
 {
@@ -41,8 +45,8 @@ public class GameContent implements Serializable
 
     // TODO: Keep sorted by order should be painted back to front
     List<LocalPlayer> localPlayers;
-    List<Drawable> drawables;
-    List<Movable> movables;
+    ArrayList<Drawable> drawables;
+    THashSet<Movable> movables;
     List<Drawable> addDrawableQueue;
     List<Movable> addMovableQueue;
     List<Drawable> removeQueue;
@@ -54,19 +58,17 @@ public class GameContent implements Serializable
         this.panel = panel;
         savedState = null;
 
-        localPlayers = new ArrayList<>();
+        localPlayers = new ArrayList<LocalPlayer>();
         drawables = new ArrayList<Drawable>();
-        movables = new ArrayList<Movable>();
+        movables = new THashSet<Movable>();
         addDrawableQueue = new ArrayList<Drawable>();
         addMovableQueue = new ArrayList<Movable>();
         removeQueue = new LinkedList<Drawable>();
 
-        SnowflakeSource snowflakeSource = new SnowflakeSource(GAME_WIDTH / 2, 0, this);
-        drawables.add(snowflakeSource);
-        movables.add(snowflakeSource);
+        addMovable(new SnowflakeSource(GAME_WIDTH/2,0, this));
 
         SolidRectangle floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
-        drawables.add(floor);
+        addDrawable(floor);
 
         for(int i = 0; i < NUM_PLATFORMS; i++)
         {
@@ -128,26 +130,48 @@ public class GameContent implements Serializable
         adjustFrameIfNecessary();
     }
 
+    // TODO: don't use arraylist, too slow
+    // dont use THashSet, nonconstant order
     public void addOrRemoveQueuedElements()
     {
-        if(removeQueue.size() > 0)
         {
-            drawables.removeAll(removeQueue);
-            movables.removeAll(removeQueue);
-            removeQueue.clear();
-        }
+            Iterator<Drawable> it;
+            Drawable current;
+            if(removeQueue.size() > 0)
+            {
+                it = removeQueue.iterator();
+                while(it.hasNext())
+                {
+                    current = it.next();
+                    drawables.remove(current);
+                    movables.remove(current);
+                    it.remove();
+                }
+            }
 
-        if(addDrawableQueue.size() > 0)
-        {
-            drawables.addAll(addDrawableQueue);
-            addDrawableQueue.clear();
+            if(addDrawableQueue.size() > 0)
+            {
+                it = addDrawableQueue.iterator();
+                while(it.hasNext())
+                {
+                    current = it.next();
+                    drawables.add(current);
+                    it.remove();
+                }
+            }
         }
 
         if(addMovableQueue.size() > 0)
         {
-            drawables.addAll(addMovableQueue);
-            movables.addAll(addMovableQueue);
-            addMovableQueue.clear();
+            Iterator<Movable> it = addMovableQueue.iterator();
+            Movable current;
+            while(it.hasNext())
+            {
+                current = it.next();
+                drawables.add(current);
+                movables.add(current);
+                it.remove();
+            }
         }
     }
 

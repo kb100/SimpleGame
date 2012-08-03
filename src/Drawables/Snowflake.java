@@ -1,11 +1,20 @@
 import java.awt.Color;
-import java.awt.Graphics;
+import java.util.ArrayList;
 
 public class Snowflake extends SolidRectangle
 {
-    int age;
-
-    public Snowflake(int x, int y, GameContent game)
+    private int age;
+    private static int randIndex = 0;
+    private static int[] randomInts = new int[2048];
+    static
+    {
+        for(int i = 0; i < randomInts.length; ++i)
+           randomInts[i] = (int)(Math.abs(GameContent.rand.nextInt()));
+    }
+    
+    private static Color[] colors = {Color.WHITE, new Color(250,250,250), new Color(240,240,255), new Color(220,220,220), new Color(230,230,250)};
+    
+    private Snowflake(int x, int y, GameContent game)
     {
         super(x, y, randomSnowflakeSize(), randomSnowflakeSize(), randomSnowflakeColor(), game);
         this.dxMax = 5;
@@ -17,9 +26,9 @@ public class Snowflake extends SolidRectangle
 
     public void control()
     {
-        dx += GameContent.rand.nextInt(3) - 1;
-        dy += GameContent.rand.nextInt(4) - 2;
-        if(GameContent.rand.nextInt(32) == 0)
+        dx += randInt(3) - 1;
+        dy += randInt(4) - 2;
+        if(randInt(32) == 0)
             decay();
 
     }
@@ -27,22 +36,69 @@ public class Snowflake extends SolidRectangle
     public void decay()
     {
         age++;
-        color = new Color(color.getRed() - 5, color.getGreen() - 5, color.getBlue() - 5);
+        color = randomSnowflakeColor();
         if(age == 5)
         {
-            remove();
+            super.remove();
+            Snowflake.Mempool.returnSnowflake(this);
         }
     }
+    
+//    public void remove()
+//    {
+//        super.remove();
+//        Snowflake.Mempool.returnSnowflake(this);
+//    }
 
-    public static int randomSnowflakeSize()
+    private static int randomSnowflakeSize()
     {
-        return 1 + GameContent.rand.nextInt(3);
+        return 1 + randInt(3);
     }
 
     public static Color randomSnowflakeColor()
     {
-        int n = GameContent.rand.nextInt(56) + 200;
-        return new Color(n, n, n);
+        return colors[randInt(colors.length)];
+    }
+    
+    private static int randInt(int max)
+    {
+        int rand = randomInts[randIndex++] % max;
+        randIndex %= randomInts.length;
+        return rand;
     }
 
+    
+    public static class Mempool
+    {
+        private static ArrayList<Snowflake> available = new ArrayList<Snowflake>(1024);
+        private static int snowflakeCount = 1024;
+        
+        public static Snowflake checkoutSnowflake(int x, int y, GameContent game)
+        {
+            if(available.isEmpty())
+                doublePoolSize();
+            
+            Snowflake snowflake = available.remove(available.size()-1);
+            snowflake.x = x;
+            snowflake.y = y;
+            snowflake.age = 0;
+            snowflake.game = game;
+
+            return snowflake;
+        }
+        
+        private static void doublePoolSize()
+        {
+            for(int i = 0; i < snowflakeCount; ++i)
+            {
+                available.add(new Snowflake(0, 0, null));
+            }
+            snowflakeCount *= 2;
+        }
+        
+        public static void returnSnowflake(Snowflake snowflake)
+        {
+            available.add(snowflake);
+        }
+    }
 }
