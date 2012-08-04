@@ -59,8 +59,8 @@ public class GamePanel extends JPanel implements ActionListener
         g.drawString("drawables: " + game.drawables.size(), 10, 30);
         g.drawString("movables: " + game.movables.size(), 10, 45);
         g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
-        
-       // game.tree.draw(g);
+
+        game.tree.draw(g);
 
     }
 
@@ -74,7 +74,8 @@ public class GamePanel extends JPanel implements ActionListener
     {
         if(timer.getDelay() == 25)
             timer.setDelay(500);
-        else timer.setDelay(25);
+        else
+            timer.setDelay(25);
     }
 
     public synchronized void loadSavedState()

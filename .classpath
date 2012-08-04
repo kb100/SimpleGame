@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="Collisions/|Controllers/|GUI/|Players/|Drawables/|Drawables/Sources/" kind="src" path="src"/>
+	<classpathentry excluding="Collisions/|Controllers/|GUI/|Players/|Drawables/|Drawables/Sources/|Memory/" kind="src" path="src"/>
 	<classpathentry kind="src" path="src/Collisions"/>
 	<classpathentry kind="src" path="src/Controllers"/>
 	<classpathentry kind="src" path="src/GUI"/>

@@ -1,5 +1,5 @@
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 
 public class Snowflake extends SolidRectangle
 {
@@ -39,16 +39,15 @@ public class Snowflake extends SolidRectangle
         color = randomSnowflakeColor();
         if(age == 5)
         {
-            super.remove();
-            Snowflake.Mempool.returnSnowflake(this);
+            this.remove();
         }
     }
     
-//    public void remove()
-//    {
-//        super.remove();
-//        Snowflake.Mempool.returnSnowflake(this);
-//    }
+    public void remove()
+    {
+        super.remove();
+        Snowflake.Mempool.returnSnowflake(this);
+    }
 
     private static int randomSnowflakeSize()
     {
@@ -70,7 +69,7 @@ public class Snowflake extends SolidRectangle
     
     public static class Mempool
     {
-        private static ArrayList<Snowflake> available = new ArrayList<Snowflake>(1024);
+        private static ArrayDeque<Snowflake> available = new ArrayDeque<Snowflake>(1024);
         private static int snowflakeCount = 1024;
         
         public static Snowflake checkoutSnowflake(int x, int y, GameContent game)
@@ -78,7 +77,7 @@ public class Snowflake extends SolidRectangle
             if(available.isEmpty())
                 doublePoolSize();
             
-            Snowflake snowflake = available.remove(available.size()-1);
+            Snowflake snowflake = available.pollLast();
             snowflake.x = x;
             snowflake.y = y;
             snowflake.age = 0;
@@ -90,15 +89,14 @@ public class Snowflake extends SolidRectangle
         private static void doublePoolSize()
         {
             for(int i = 0; i < snowflakeCount; ++i)
-            {
-                available.add(new Snowflake(0, 0, null));
-            }
+                available.addLast(new Snowflake(0, 0, null));
+
             snowflakeCount *= 2;
         }
         
         public static void returnSnowflake(Snowflake snowflake)
         {
-            available.add(snowflake);
+            available.addLast(snowflake);
         }
     }
 }

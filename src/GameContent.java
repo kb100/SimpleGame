@@ -1,3 +1,5 @@
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -6,15 +8,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
-
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
 
 public class GameContent implements Serializable
 {
@@ -29,6 +28,10 @@ public class GameContent implements Serializable
     static final int NUM_PLATFORMS = 1000;
 
     static Random rand = new Random();
+    static
+    {
+        rand.setSeed(1 << 5);
+    }
 
     public static Color randomColor()
     {
@@ -44,12 +47,12 @@ public class GameContent implements Serializable
     Drawable frameReference;
 
     // TODO: Keep sorted by order should be painted back to front
-    List<LocalPlayer> localPlayers;
-    ArrayList<Drawable> drawables;
+    ArrayDeque<LocalPlayer> localPlayers;
+    LinkedHashSet<Drawable> drawables;
     THashSet<Movable> movables;
-    List<Drawable> addDrawableQueue;
-    List<Movable> addMovableQueue;
-    List<Drawable> removeQueue;
+    ArrayDeque<Drawable> addDrawableQueue;
+    ArrayDeque<Movable> addMovableQueue;
+    ArrayDeque<Drawable> removeQueue;
 
     QuadTree tree = new QuadTree();
 
@@ -58,21 +61,20 @@ public class GameContent implements Serializable
         this.panel = panel;
         savedState = null;
 
-        localPlayers = new ArrayList<LocalPlayer>();
-        drawables = new ArrayList<Drawable>();
+        localPlayers = new ArrayDeque<LocalPlayer>();
+        drawables = new LinkedHashSet<Drawable>();
         movables = new THashSet<Movable>();
-        addDrawableQueue = new ArrayList<Drawable>();
-        addMovableQueue = new ArrayList<Movable>();
-        removeQueue = new LinkedList<Drawable>();
+        addDrawableQueue = new ArrayDeque<Drawable>();
+        addMovableQueue = new ArrayDeque<Movable>();
+        removeQueue = new ArrayDeque<Drawable>();
 
-        addMovable(new SnowflakeSource(GAME_WIDTH/2,0, this));
+        addMovable(new SnowflakeSource(GAME_WIDTH / 2, 0, this));
 
         SolidRectangle floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
         addDrawable(floor);
 
         for(int i = 0; i < NUM_PLATFORMS; i++)
         {
-
             drawables.add(new SolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
             drawables.add(new VanishingSolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
         }
@@ -130,48 +132,25 @@ public class GameContent implements Serializable
         adjustFrameIfNecessary();
     }
 
-    // TODO: don't use arraylist, too slow
-    // dont use THashSet, nonconstant order
     public void addOrRemoveQueuedElements()
     {
+        Drawable currentDrawable;
+        while((currentDrawable = removeQueue.pollLast()) != null)
         {
-            Iterator<Drawable> it;
-            Drawable current;
-            if(removeQueue.size() > 0)
-            {
-                it = removeQueue.iterator();
-                while(it.hasNext())
-                {
-                    current = it.next();
-                    drawables.remove(current);
-                    movables.remove(current);
-                    it.remove();
-                }
-            }
-
-            if(addDrawableQueue.size() > 0)
-            {
-                it = addDrawableQueue.iterator();
-                while(it.hasNext())
-                {
-                    current = it.next();
-                    drawables.add(current);
-                    it.remove();
-                }
-            }
+            drawables.remove(currentDrawable);
+            movables.remove(currentDrawable);
         }
 
-        if(addMovableQueue.size() > 0)
+        while((currentDrawable = addDrawableQueue.pollLast()) != null)
         {
-            Iterator<Movable> it = addMovableQueue.iterator();
-            Movable current;
-            while(it.hasNext())
-            {
-                current = it.next();
-                drawables.add(current);
-                movables.add(current);
-                it.remove();
-            }
+            drawables.add(currentDrawable);
+        }
+
+        Movable currentMovable;
+        while((currentMovable = addMovableQueue.pollLast()) != null)
+        {
+            drawables.add(currentMovable);
+            movables.add(currentMovable);
         }
     }
 
@@ -193,7 +172,8 @@ public class GameContent implements Serializable
     {
         if(frameReference == player)
             frameReference = player2;
-        else frameReference = player;
+        else
+            frameReference = player;
     }
 
     List<SolidRectangle> findSolidRectanglesInArea(Rectangle rectangle)
