@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 
-public class GameContent implements Serializable
+public class GameContent implements Serializable, Runnable
 {
 
     static final Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -25,7 +25,7 @@ public class GameContent implements Serializable
 
     static final int PLAYER_HEIGHT = 50;
     static final int PLAYER_WIDTH = 25;
-    static final int NUM_PLATFORMS = 1000;
+    static final int NUM_PLATFORMS = 500;
 
     static Random rand = new Random();
     static
@@ -39,8 +39,8 @@ public class GameContent implements Serializable
     }
 
     transient GamePanel panel;
+    transient GameContent savedState;
 
-    GameContent savedState;
     LocalPlayer player;
     LocalPlayer player2;
 
@@ -68,15 +68,16 @@ public class GameContent implements Serializable
         addMovableQueue = new ArrayDeque<Movable>();
         removeQueue = new ArrayDeque<Drawable>();
 
-        addMovable(new SnowflakeSource(GAME_WIDTH / 2, 0, this));
+        for(int i = 5 * GAME_WIDTH / 16; i <= 7 * GAME_WIDTH / 16; i += 8)
+            addMovable(new SnowflakeSource(i, 0, this));
 
         SolidRectangle floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
         addDrawable(floor);
 
         for(int i = 0; i < NUM_PLATFORMS; i++)
         {
-            drawables.add(new SolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
-            drawables.add(new VanishingSolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            addDrawable(new SolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
+            addDrawable(new VanishingSolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
         }
 
         LandMine mine = new LandMine(700, 50, this);
@@ -156,8 +157,12 @@ public class GameContent implements Serializable
 
     public void adjustFrameIfNecessary()
     {
-        int dx = calculateShift(GAME_WIDTH, frameReference.x);
-        int dy = calculateShift(GAME_HEIGHT, frameReference.y);
+        int dx, dy;
+       // synchronized(frameReference)
+       // {
+            dx = calculateShift(GAME_WIDTH, frameReference.x);
+            dy = calculateShift(GAME_HEIGHT, frameReference.y);
+       // }
 
         if(dx != 0 || dy != 0)
         {

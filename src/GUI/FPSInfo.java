@@ -4,6 +4,7 @@ public class FPSInfo
 {
     private static LinkedList<Long> times = new LinkedList<Long>();
     private static final int FRAMES = 20;
+    static double lastFPS = 0;
 
     private static long getNanosSinceLastUpdate()
     {
@@ -16,6 +17,6 @@ public class FPSInfo
     public static double getFPS()
     {
         long nanos = getNanosSinceLastUpdate();
-        return FRAMES * 1_000_000_000d / nanos;
+        return lastFPS = (FRAMES * 1_000_000_000d / nanos);
     }
 }

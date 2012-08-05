@@ -69,9 +69,74 @@ public class CollisionHandler
         {
             handleCollision((LocalPlayer)drawable1, (LocalPlayer)drawable2);
         }
+        else if(clazz1 == Snowflake.class && clazz2 == Snowflake.class)
+        {
+            handleCollision((Snowflake)drawable1, (Snowflake)drawable2);
+        }
+        else if(clazz1 == Snowflake.class && drawable2 instanceof SolidRectangle)
+        {
+            handleCollision((Snowflake)drawable1, (SolidRectangle)drawable2);
+        }
+        else if(drawable1 instanceof SolidRectangle && clazz2 == Snowflake.class)
+        {
+            handleCollision((Snowflake)drawable2, (SolidRectangle)drawable1);
+        }
         else
         {
             throw new IllegalArgumentException("Unhandled class collision pair: (" + clazz1 + ", " + clazz2 + ")");
+        }
+    }
+
+    public static void handleCollision(Snowflake snowflake, SolidRectangle rectangle)
+    {
+        Area area = new Area(snowflake.toRectangle());
+        area.intersect(new Area(rectangle.toRectangle()));
+        if(!area.isEmpty())
+        {
+            int sign;
+            Rectangle intersection = area.getBounds();
+            if(intersection.width <= intersection.height)
+            {
+                // do a horizontal shift
+                sign = (intersection.getCenterX() - snowflake.toRectangle().getCenterX()) < 0 ? 1 : -1;
+                snowflake.unconditionalShift((intersection.width) * sign, 0);
+                snowflake.dx = 0;
+            }
+            if(intersection.width >= intersection.height)
+            {
+                // do a vertical shift
+                sign = (intersection.getCenterY() - snowflake.toRectangle().getCenterY()) < 0 ? 1 : -1;
+                snowflake.unconditionalShift(0, (intersection.height) * sign);
+                snowflake.dx = snowflake.ddx = snowflake.dy = 0;
+            }
+
+            if(rectangle.toRectangle().contains(snowflake.toRectangle()))
+                snowflake.remove();
+        }
+    }
+
+    public static void handleCollision(Snowflake snowflake, Snowflake snowflake2)
+    {
+        Area area = new Area(snowflake.toRectangle());
+        area.intersect(new Area(snowflake2.toRectangle()));
+        if(!area.isEmpty() && snowflake.dy < 2 && snowflake2.dy < 2)
+        {
+            int sign;
+            Rectangle intersection = area.getBounds();
+            if(intersection.width <= intersection.height)
+            {
+                // do a horizontal shift
+                sign = (intersection.getCenterX() - snowflake.toRectangle().getCenterX()) < 0 ? 1 : -1;
+                snowflake.unconditionalShift((intersection.width) * sign, 0);
+            }
+            if(intersection.width >= intersection.height)
+            {
+                // do a vertical shift
+                sign = (intersection.getCenterY() - snowflake.toRectangle().getCenterY()) < 0 ? 1 : -1;
+                snowflake.unconditionalShift(0, (intersection.height) * sign);
+                snowflake.dy = 0;
+                snowflake2.dy = 0;
+            }
         }
     }
 
@@ -130,8 +195,8 @@ public class CollisionHandler
                 sign = (intersection.getCenterX() - player.toRectangle().getCenterX()) < 0 ? 1 : -1;
                 player.unconditionalShift((intersection.width) * sign, 0);
                 player.dx = 0;
-                // if(player.dy>0) player.dy--;
-                // else if(player.dy < 0) player.dy++;
+                if(player.ddx * sign < 0)
+                    player.slow(0, 1);
             }
             if(intersection.width >= intersection.height)
             {

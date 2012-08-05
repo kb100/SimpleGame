@@ -3,6 +3,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,6 +20,8 @@ public class GamePanel extends JPanel implements ActionListener
     GameController controller2;
     FPSInfo fps;
     byte[] save;
+    boolean drawQuadTree;
+    boolean drawFPSInfo;
 
     public GamePanel()
     {
@@ -29,6 +32,8 @@ public class GamePanel extends JPanel implements ActionListener
         save = null;
 
         game = new GameContent(this);
+        drawQuadTree = false;
+        drawFPSInfo = true;
 
         controller = new GameController();
         this.addKeyListener(controller);
@@ -40,6 +45,49 @@ public class GamePanel extends JPanel implements ActionListener
 
         timer = new Timer(25, this);
         timer.start();
+
+        this.addKeyListener(new KeyListener()
+        {
+            public void keyTyped(KeyEvent e)
+            {
+            }
+
+            public void keyReleased(KeyEvent e)
+            {
+            }
+
+            public void keyPressed(KeyEvent e)
+            {
+                int code = e.getKeyCode();
+                if(code == KeyEvent.VK_1) // load/save
+                {
+                    if((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)
+                        setSaveState();
+                    else
+                        loadSavedState();
+                }
+                else if(code == KeyEvent.VK_BACK_SPACE) // toggle reference frame
+                {
+                    game.toggleReferenceFrame();
+                }
+                else if(code == KeyEvent.VK_2)
+                {
+                    toggleTimerSpeed();
+                }
+                else if(code == KeyEvent.VK_3)
+                {
+                    drawQuadTree = !drawQuadTree;
+                }
+                else if(code == KeyEvent.VK_4)
+                {
+                    drawFPSInfo = !drawFPSInfo;
+                }
+                else if(code == KeyEvent.VK_ESCAPE)
+                {
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     public void paintComponent(Graphics g)
@@ -49,18 +97,21 @@ public class GamePanel extends JPanel implements ActionListener
         for(Drawable drawMe : game.drawables)
         {
             if(drawMe.isOnScreen())
-            {
                 drawMe.draw(g);
-            }
         }
 
-        g.setColor(Color.green);
-        g.drawString("FPS: " + FPSInfo.getFPS(), 10, 15);
-        g.drawString("drawables: " + game.drawables.size(), 10, 30);
-        g.drawString("movables: " + game.movables.size(), 10, 45);
-        g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
+        if(drawFPSInfo)
+        {
 
-        game.tree.draw(g);
+            g.setColor(Color.green);
+            g.drawString("FPS: " + FPSInfo.getFPS(), 10, 15);
+            g.drawString("drawables: " + game.drawables.size(), 10, 30);
+            g.drawString("movables: " + game.movables.size(), 10, 45);
+            g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
+        }
+
+        if(drawQuadTree)
+            game.tree.draw(g);
 
     }
 

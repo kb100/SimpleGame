@@ -39,72 +39,46 @@ public class LocalPlayer extends Movable
     public void control()
     {
         ControllerState state = controller.getControllerState();
-        if(state.exit)
-        {
-            controller.hasBeenHandled(controller.keyExit);
-            game.panel.loadSavedState();
-            // game.saveState();
-            // System.exit(0);
-        }
-
-        if(state.select)
-        {
-            game.toggleReferenceFrame();
-            controller.hasBeenHandled(controller.keySelect);
-        }
-
-        // Slow motion for debugging purposes
-        if(state.start)
-        {
-            // game.panel.toggleTimerSpeed();
-            controller.hasBeenHandled(controller.keyStart);
-            game.panel.setSaveState();
-        }
-
         ddy = 1;
-        if(disabledTime > 0)
-            return;
-
-        if(state.left)
-            ddx = -1;
-        else if(state.right)
-            ddx = 1;
-        else ddx = 0;
-
-        if(state.down)
+        if(disabledTime == 0)
         {
-            if(!crouching)
+            if(state.left)
+                ddx = -1;
+            else if(state.right)
+                ddx = 1;
+            else
+                ddx = 0;
+
+            if(state.down)
             {
-                height -= crouchingHeightChange;
-                y += crouchingHeightChange;
-                crouching = true;
+                if(!crouching)
+                {
+                    height -= crouchingHeightChange;
+                    y += crouchingHeightChange;
+                    crouching = true;
+                }
             }
-        }
-        else
-        {
-            if(crouching && roomToUncrouch())
+            else
             {
-                y -= crouchingHeightChange;
-                height += crouchingHeightChange;
-                crouching = false;
+                if(crouching && roomToUncrouch())
+                {
+                    y -= crouchingHeightChange;
+                    height += crouchingHeightChange;
+                    crouching = false;
+                }
             }
+
+            if(state.jump)
+                jump();
+
         }
 
-        if(state.jump)
-            jump();
-
-    }
-
-    public void update()
-    {
-        super.update();
         if(disabledTime > 0)
             disabledTime--;
         if(disabledTime == 0)
             color = Color.white;
         if(turning())
             dx /= 2;
-
     }
 
     public boolean turning()
@@ -126,6 +100,19 @@ public class LocalPlayer extends Movable
     public void jump()
     {
         dy = -10;
+    }
+
+    public void slow(int xSlow, int ySlow)
+    {
+        if(dx > 0)
+            dx -= xSlow;
+        else
+            dx += xSlow;
+
+        if(dy > 0)
+            dy -= ySlow;
+        else
+            dy += ySlow;
     }
 
     public void disable(int time)

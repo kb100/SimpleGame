@@ -8,34 +8,28 @@ public class GameController implements KeyListener, Controller, Serializable
     int keyRight;
     int keyUp;
     int keyDown;
-    int keyStart;
-    int keySelect;
     int keyJump;
-    int keyExit;
     ControllerState state;
 
     public GameController()
     {
         state = new ControllerState();
-        configureButtons(KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_ENTER, KeyEvent.VK_BACK_SPACE, KeyEvent.VK_SPACE, KeyEvent.VK_ESCAPE);
+        configureButtons(KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_SPACE);
     }
 
     public GameController(int keyLeft, int keyRight, int keyUp, int keyDown, int keyStart, int keySelect, int keyJump, int keyExit)
     {
         state = new ControllerState();
-        configureButtons(keyLeft, keyRight, keyUp, keyDown, keyStart, keySelect, keyJump, keyExit);
+        configureButtons(keyLeft, keyRight, keyUp, keyDown, keyJump);
     }
 
-    public synchronized void configureButtons(int keyLeft, int keyRight, int keyUp, int keyDown, int keyStart, int keySelect, int keyJump, int keyExit)
+    public synchronized void configureButtons(int keyLeft, int keyRight, int keyUp, int keyDown, int keyJump)
     {
         this.keyLeft = keyLeft;
         this.keyRight = keyRight;
         this.keyUp = keyUp;
         this.keyDown = keyDown;
-        this.keyStart = keyStart;
-        this.keySelect = keySelect;
         this.keyJump = keyJump;
-        this.keyExit = keyExit;
     }
 
     public synchronized void keyPressed(KeyEvent e)
@@ -51,12 +45,6 @@ public class GameController implements KeyListener, Controller, Serializable
             state.down = true;
         else if(code == keyJump)
             state.jump = true;
-        else if(code == keyStart)
-            state.start = true;
-        else if(code == keySelect)
-            state.select = true;
-        else if(code == keyExit)
-            state.exit = true;
     }
 
     public synchronized void keyReleased(KeyEvent e)
@@ -72,16 +60,6 @@ public class GameController implements KeyListener, Controller, Serializable
             state.down = false;
         else if(code == keyJump)
             state.jump = false;
-    }
-
-    public synchronized void hasBeenHandled(int code)
-    {
-        if(code == keyStart)
-            state.start = false;
-        else if(code == keySelect)
-            state.select = false;
-        else if(code == keyExit)
-            state.exit = false;
     }
 
     public synchronized ControllerState getControllerState()

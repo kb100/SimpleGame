@@ -28,17 +28,9 @@ public class SimpleGame extends JApplet
                 panel.setLocation((e.getComponent().getWidth() - GameContent.GAME_WIDTH) / 2, (e.getComponent().getHeight() - GameContent.GAME_HEIGHT) / 2);
             }
 
-            public void componentShown(ComponentEvent e)
-            {
-            }
-
-            public void componentMoved(ComponentEvent e)
-            {
-            }
-
-            public void componentHidden(ComponentEvent e)
-            {
-            }
+            public void componentShown(ComponentEvent e){}
+            public void componentMoved(ComponentEvent e){}
+            public void componentHidden(ComponentEvent e){}
         });
     }
 

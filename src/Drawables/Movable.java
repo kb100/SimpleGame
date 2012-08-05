@@ -17,7 +17,7 @@ public abstract class Movable extends Drawable
 
     public abstract void control();
 
-    public void update()
+    public final void update()
     {
         x += dx;
         dx += ddx;

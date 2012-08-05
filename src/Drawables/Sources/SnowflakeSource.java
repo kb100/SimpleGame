@@ -8,7 +8,7 @@ public class SnowflakeSource extends Source<Snowflake>
 
     public void produceMovable()
     {
-        for(int i = 0; i < 110; ++i)
+        for(int i = 0; i < 1; ++i)
             game.addMovable(Snowflake.Mempool.checkoutSnowflake(x, y, game));
     }
 
