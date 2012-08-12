@@ -17,7 +17,7 @@ public class GameController implements KeyListener, Controller, Serializable
         configureButtons(KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_SPACE);
     }
 
-    public GameController(int keyLeft, int keyRight, int keyUp, int keyDown, int keyStart, int keySelect, int keyJump, int keyExit)
+    public GameController(int keyLeft, int keyRight, int keyUp, int keyDown, int keyJump)
     {
         state = new ControllerState();
         configureButtons(keyLeft, keyRight, keyUp, keyDown, keyJump);

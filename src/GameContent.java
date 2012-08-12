@@ -68,7 +68,7 @@ public class GameContent implements Serializable, Runnable
         addMovableQueue = new ArrayDeque<Movable>();
         removeQueue = new ArrayDeque<Drawable>();
 
-        for(int i = 5 * GAME_WIDTH / 16; i <= 7 * GAME_WIDTH / 16; i += 8)
+        for(int i = 3 * GAME_WIDTH / 16; i <= 9 * GAME_WIDTH / 16; i += 16)
             addMovable(new SnowflakeSource(i, 0, this));
 
         SolidRectangle floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
@@ -157,19 +157,14 @@ public class GameContent implements Serializable, Runnable
 
     public void adjustFrameIfNecessary()
     {
-        int dx, dy;
-       // synchronized(frameReference)
-       // {
-            dx = calculateShift(GAME_WIDTH, frameReference.x);
-            dy = calculateShift(GAME_HEIGHT, frameReference.y);
-       // }
+        final Drawable reference = frameReference; // switching frame reference is user-driven
+        final int dx = calculateShift(GAME_WIDTH, reference.x);
+        final int dy = calculateShift(GAME_HEIGHT, reference.y);
 
         if(dx != 0 || dy != 0)
         {
             for(Drawable shiftMe : drawables)
-            {
                 shiftMe.unconditionalShift(dx, dy);
-            }
         }
     }
 
@@ -189,9 +184,7 @@ public class GameContent implements Serializable, Runnable
             if(drawable instanceof SolidRectangle)
             {
                 if(rectangle.intersects(((SolidRectangle)drawable).toRectangle()))
-                {
                     rectangles.add((SolidRectangle)drawable);
-                }
             }
         }
         return rectangles;
@@ -203,9 +196,7 @@ public class GameContent implements Serializable, Runnable
         for(LocalPlayer player : localPlayers)
         {
             if(rectangle.intersects(player.toRectangle()))
-            {
                 inArea.add(player);
-            }
         }
         return inArea;
     }

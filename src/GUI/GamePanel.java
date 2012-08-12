@@ -39,55 +39,51 @@ public class GamePanel extends JPanel implements ActionListener
         this.addKeyListener(controller);
         game.player.controller = controller;
 
-        controller2 = new GameController(KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_0, KeyEvent.VK_9, KeyEvent.VK_SHIFT, KeyEvent.VK_8);
+        controller2 = new GameController(KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_SHIFT);
         this.addKeyListener(controller2);
         game.player2.controller = controller2;
 
         timer = new Timer(25, this);
         timer.start();
 
-//        this.addKeyListener(new KeyListener()
-//        {
-//            public void keyTyped(KeyEvent e)
-//            {
-//            }
-//
-//            public void keyReleased(KeyEvent e)
-//            {
-//            }
-//
-//            public void keyPressed(KeyEvent e)
-//            {
-//                int code = e.getKeyCode();
-//                if(code == KeyEvent.VK_1) // load/save
-//                {
-//                    if((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)
-//                        setSaveState();
-//                    else
-//                        loadSavedState();
-//                }
-//                else if(code == KeyEvent.VK_BACK_SPACE) // toggle reference frame
-//                {
-//                    game.toggleReferenceFrame();
-//                }
-//                else if(code == KeyEvent.VK_2)
-//                {
-//                    toggleTimerSpeed();
-//                }
-//                else if(code == KeyEvent.VK_3)
-//                {
-//                    drawQuadTree = !drawQuadTree;
-//                }
-//                else if(code == KeyEvent.VK_4)
-//                {
-//                    drawFPSInfo = !drawFPSInfo;
-//                }
-//                else if(code == KeyEvent.VK_ESCAPE)
-//                {
-//                    System.exit(0);
-//                }
-//            }
-//        });
+        this.addKeyListener(new KeyListener()
+        {
+            public void keyTyped(KeyEvent e){}
+
+            public void keyReleased(KeyEvent e){}
+
+            public void keyPressed(KeyEvent e)
+            {
+                int code = e.getKeyCode();
+                if(code == KeyEvent.VK_1) // load/save
+                {
+                    if((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)
+                        setSaveState();
+                    else
+                        loadSavedState();
+                }
+                else if(code == KeyEvent.VK_BACK_SPACE)
+                {
+                    game.toggleReferenceFrame();
+                }
+                else if(code == KeyEvent.VK_2)
+                {
+                    toggleTimerSpeed();
+                }
+                else if(code == KeyEvent.VK_3)
+                {
+                    drawQuadTree = !drawQuadTree;
+                }
+                else if(code == KeyEvent.VK_4)
+                {
+                    drawFPSInfo = !drawFPSInfo;
+                }
+                else if(code == KeyEvent.VK_ESCAPE)
+                {
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     public void paintComponent(Graphics g)

@@ -83,7 +83,7 @@ public class Snowflake extends SolidRectangle
         public static Snowflake checkoutSnowflake(int x, int y, GameContent game)
         {
             if(available.isEmpty())
-                doublePoolSize();
+                makeMoreSnowflakes();
 
             Snowflake snowflake = available.pollLast();
             snowflake.x = x;
@@ -96,12 +96,12 @@ public class Snowflake extends SolidRectangle
             return snowflake;
         }
 
-        private static void doublePoolSize()
+        private static void makeMoreSnowflakes()
         {
-            for(int i = 0; i < snowflakeCount; ++i)
+            for(int i = 0; i < 1024; ++i)
                 available.addLast(new Snowflake(0, 0, null));
 
-            snowflakeCount *= 2;
+            snowflakeCount += 1024;
         }
 
         public static void returnSnowflake(Snowflake snowflake)

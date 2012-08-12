@@ -284,13 +284,13 @@ public class QuadTree implements Serializable
 
         public static class Mempool
         {
-            private static ArrayDeque<Node> available = new ArrayDeque<Node>(1024);
-            private static int nodeCount = 1024;
+            private static ArrayDeque<Node> available = new ArrayDeque<Node>(2048);
+            private static int nodeCount = 2048;
 
             public static Node checkout(int xMin, int xMax, int yMin, int yMax, int level)
             {
                 if(available.isEmpty())
-                    doublePoolSize();
+                    makeMoreNodes();
 
                 Node toCheckout = available.pollLast();
                 toCheckout.xMin = xMin;
@@ -308,12 +308,12 @@ public class QuadTree implements Serializable
                 return toCheckout;
             }
 
-            private static void doublePoolSize()
+            private static void makeMoreNodes()
             {
-                for(int i = 0; i < nodeCount; ++i)
+                for(int i = 0; i < 1024; ++i)
                     available.addLast(new Node(0, 0, 0, 0, 0));
 
-                nodeCount *= 2;
+                nodeCount += 1024;
             }
 
             public static void returnNode(Node toReturn)
