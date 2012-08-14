@@ -1,5 +1,5 @@
 import java.awt.Color;
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 public class LandMine extends SolidRectangle
@@ -13,7 +13,7 @@ public class LandMine extends SolidRectangle
         CollisionHandler.registerCollisions(LandMine.class, VanishingSolidRectangle.class);
     }
 
-    public LandMine(int x, int y, GameContent game)
+    public LandMine(double x, double y, GameContent game)
     {
         super(x, y, 20, 10, Color.GRAY, game);
         timeUntilExplode = 20;
@@ -39,9 +39,9 @@ public class LandMine extends SolidRectangle
 
     public void explode()
     {
-        for(int i = x; i < x + width; i++)
+        for(double i = x; i < x + width; i++)
         {
-            for(int j = y; j < y + height; j++)
+            for(double j = y; j < y + height; j++)
             {
                 // for (int k = 0; k < 10; k++)
                 {
@@ -51,7 +51,7 @@ public class LandMine extends SolidRectangle
             }
         }
 
-        List<LocalPlayer> players = game.findPlayersInArea(new Rectangle(x - 10, y - 10, width + 20, width + 20));
+        List<LocalPlayer> players = game.findPlayersInArea(new Rectangle2D.Double(x - 10, y - 10, width + 20, width + 20));
         for(LocalPlayer player : players)
         {
             player.dx = ((player.x + player.width / 2) - (x + width / 2));

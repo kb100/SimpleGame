@@ -4,7 +4,7 @@ public class ExplosionParticle extends SolidRectangle
 {
     int age;
 
-    public ExplosionParticle(int x, int y, GameContent game)
+    public ExplosionParticle(double x, double y, GameContent game)
     {
         super(x, y, randomSize(), randomSize(), randomFireColor(), game);
         this.dxMax = 50;
@@ -13,8 +13,8 @@ public class ExplosionParticle extends SolidRectangle
         ddx = 0;
         age = 0;
         double theta = Math.random() * Math.PI;
-        dy = (int)(-20 * Math.sin(theta));
-        dx = (int)(20 * Math.cos(theta));
+        dy = (double)(-20d * Math.sin(theta));
+        dx = (double)(20d * Math.cos(theta));
     }
 
     public void control()

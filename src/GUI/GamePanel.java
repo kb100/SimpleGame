@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener
 
     public GamePanel()
     {
-        this.setSize(GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT);
+        this.setSize((int)GameContent.GAME_WIDTH, (int)GameContent.GAME_HEIGHT);
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
 

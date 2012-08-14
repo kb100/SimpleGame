@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 //Does not extend SolidRectangle on purpose
@@ -8,7 +9,7 @@ public class LocalPlayer extends Movable
 {
 
     boolean crouching;
-    int crouchingHeightChange;
+    double crouchingHeightChange;
     int disabledTime;
 
     Color color;
@@ -24,14 +25,14 @@ public class LocalPlayer extends Movable
         CollisionHandler.registerCollisions(LocalPlayer.class, LandMine.class);
     }
 
-    public LocalPlayer(int x, int y, int width, int height, GameContent game)
+    public LocalPlayer(double x, double y, double width, double height, GameContent game)
     {
         super(x, y, width, height, 8, 18, game);
 
         this.color = Color.WHITE;
 
         this.crouching = false;
-        crouchingHeightChange = (int)(height * .3);
+        crouchingHeightChange = height * .3d;
         disabledTime = 0;
 
     }
@@ -88,7 +89,7 @@ public class LocalPlayer extends Movable
 
     public boolean roomToUncrouch()
     {
-        List<SolidRectangle> rectangles = game.findSolidRectanglesInArea(new Rectangle(x, y - crouchingHeightChange, width, height));
+        List<SolidRectangle> rectangles = game.findSolidRectanglesInArea(new Rectangle2D.Double(x, y - crouchingHeightChange, width, height));
         for(SolidRectangle rectangle : rectangles)
         {
             if(CollisionHandler.isValidCollision(this, rectangle) && !(rectangle instanceof Snowflake))
@@ -102,7 +103,7 @@ public class LocalPlayer extends Movable
         dy = -10;
     }
 
-    public void slow(int xSlow, int ySlow)
+    public void slow(double xSlow, double ySlow)
     {
         if(dx > 0)
             dx -= xSlow;
@@ -133,12 +134,12 @@ public class LocalPlayer extends Movable
     public void draw(Graphics g)
     {
         g.setColor(color);
-        g.fillRect(x, y, width, height);
+        g.fillRect((int)x, (int)y, (int)width, (int)height);
     }
 
-    public Rectangle toRectangle()
+    public Rectangle2D.Double toRectangle()
     {
-        return new Rectangle(x, y, width, height);
+        return new Rectangle2D.Double(x, y, width, height);
     }
 
 }

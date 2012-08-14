@@ -18,7 +18,7 @@ public class Snowflake extends SolidRectangle
 
     private static Color[] colors = { Color.WHITE, new Color(250, 250, 250), new Color(240, 240, 255), new Color(220, 220, 220), new Color(230, 230, 250) };
 
-    private Snowflake(int x, int y, GameContent game)
+    private Snowflake(double x, double y, GameContent game)
     {
         super(x, y, randomSnowflakeSize(), randomSnowflakeSize(), randomSnowflakeColor(), game);
         this.dxMax = 5;
@@ -78,9 +78,8 @@ public class Snowflake extends SolidRectangle
     public static class Mempool
     {
         private static ArrayDeque<Snowflake> available = new ArrayDeque<Snowflake>(1024);
-        private static int snowflakeCount = 1024;
 
-        public static Snowflake checkoutSnowflake(int x, int y, GameContent game)
+        public static Snowflake checkoutSnowflake(double x, double y, GameContent game)
         {
             if(available.isEmpty())
                 makeMoreSnowflakes();
@@ -100,8 +99,6 @@ public class Snowflake extends SolidRectangle
         {
             for(int i = 0; i < 1024; ++i)
                 available.addLast(new Snowflake(0, 0, null));
-
-            snowflakeCount += 1024;
         }
 
         public static void returnSnowflake(Snowflake snowflake)

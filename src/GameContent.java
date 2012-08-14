@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -20,11 +21,11 @@ public class GameContent implements Serializable, Runnable
 
     static final Toolkit toolkit = Toolkit.getDefaultToolkit();
     static final Dimension dim = toolkit.getScreenSize();
-    static final int GAME_WIDTH = dim.width - 10;
-    static final int GAME_HEIGHT = dim.height - 150;
+    static final double GAME_WIDTH = dim.width - 10;
+    static final double GAME_HEIGHT = dim.height - 150;
 
-    static final int PLAYER_HEIGHT = 50;
-    static final int PLAYER_WIDTH = 25;
+    static final double PLAYER_HEIGHT = 50;
+    static final double PLAYER_WIDTH = 25;
     static final int NUM_PLATFORMS = 500;
 
     static Random rand = new Random();
@@ -68,7 +69,7 @@ public class GameContent implements Serializable, Runnable
         addMovableQueue = new ArrayDeque<Movable>();
         removeQueue = new ArrayDeque<Drawable>();
 
-        for(int i = 3 * GAME_WIDTH / 16; i <= 9 * GAME_WIDTH / 16; i += 16)
+        for(double i = 3 * GAME_WIDTH / 16; i <= 9 * GAME_WIDTH / 16; i += 16)
             addMovable(new SnowflakeSource(i, 0, this));
 
         SolidRectangle floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
@@ -158,8 +159,8 @@ public class GameContent implements Serializable, Runnable
     public void adjustFrameIfNecessary()
     {
         final Drawable reference = frameReference; // switching frame reference is user-driven
-        final int dx = calculateShift(GAME_WIDTH, reference.x);
-        final int dy = calculateShift(GAME_HEIGHT, reference.y);
+        final double dx = calculateShift(GAME_WIDTH, reference.x);
+        final double dy = calculateShift(GAME_HEIGHT, reference.y);
 
         if(dx != 0 || dy != 0)
         {
@@ -176,7 +177,7 @@ public class GameContent implements Serializable, Runnable
             frameReference = player;
     }
 
-    List<SolidRectangle> findSolidRectanglesInArea(Rectangle rectangle)
+    List<SolidRectangle> findSolidRectanglesInArea(Rectangle2D.Double rectangle)
     {
         List<SolidRectangle> rectangles = new ArrayList<SolidRectangle>();
         for(Drawable drawable : drawables)
@@ -190,7 +191,7 @@ public class GameContent implements Serializable, Runnable
         return rectangles;
     }
 
-    List<LocalPlayer> findPlayersInArea(Rectangle rectangle)
+    List<LocalPlayer> findPlayersInArea(Rectangle2D.Double rectangle)
     {
         ArrayList<LocalPlayer> inArea = new ArrayList<LocalPlayer>();
         for(LocalPlayer player : localPlayers)
@@ -201,9 +202,9 @@ public class GameContent implements Serializable, Runnable
         return inArea;
     }
 
-    private static int calculateShift(int gameDimension, int referenceDimension)
+    private static double calculateShift(double gameDimension, double referenceDimension)
     {
-        int shift;
+        double shift;
         return ((shift = (gameDimension - gameDimension / 3) - referenceDimension) < 0 || (shift = gameDimension / 3 - referenceDimension) > 0) ? shift : 0;
     }
 

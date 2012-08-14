@@ -1,14 +1,15 @@
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
 public abstract class Drawable implements Serializable
 {
-    int x, y;
-    int width, height;
+    double x, y;
+    double width, height;
     GameContent game;
 
-    public Drawable(int x, int y, int width, int height, GameContent game)
+    public Drawable(double x, double y, double width, double height, GameContent game)
     {
         this.x = x;
         this.y = y;
@@ -17,15 +18,15 @@ public abstract class Drawable implements Serializable
         this.game = game;
     }
 
-    public void unconditionalShift(int dx, int dy)
+    public void unconditionalShift(double dx, double dy)
     {
         x += dx;
         y += dy;
     }
 
-    public Rectangle getBoundingRectangle()
+    public Rectangle2D.Double getBoundingRectangle()
     {
-        return new Rectangle(x, y, width, height);
+        return new Rectangle2D.Double(x, y, width, height);
     }
 
     public void remove()

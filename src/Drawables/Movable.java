@@ -1,13 +1,13 @@
 public abstract class Movable extends Drawable
 {
 
-    int dx, ddx;
-    int dy, ddy;
+    double dx, ddx;
+    double dy, ddy;
 
-    int dxMax;
-    int dyMax;
+    double dxMax;
+    double dyMax;
 
-    public Movable(int x, int y, int width, int height, int dxMax, int dyMax, GameContent game)
+    public Movable(double x, double y, double width, double height, double dxMax, double dyMax, GameContent game)
     {
         super(x, y, width, height, game);
         this.dxMax = dxMax;

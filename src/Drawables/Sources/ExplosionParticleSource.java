@@ -1,7 +1,7 @@
 public class ExplosionParticleSource extends Source<ExplosionParticle>
 {
 
-    public ExplosionParticleSource(int x, int y, GameContent game)
+    public ExplosionParticleSource(double x, double y, GameContent game)
     {
         super(x, y, game);
     }

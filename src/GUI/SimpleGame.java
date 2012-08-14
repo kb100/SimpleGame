@@ -13,7 +13,7 @@ public class SimpleGame extends JApplet
 
     public void init()
     {
-        this.setSize(GameContent.GAME_WIDTH, GameContent.GAME_HEIGHT);
+        this.setSize((int)GameContent.GAME_WIDTH, (int)GameContent.GAME_HEIGHT);
         this.setIgnoreRepaint(true);
         panel = new GamePanel();
         Container contentPane = this.getContentPane();
@@ -25,7 +25,7 @@ public class SimpleGame extends JApplet
         {
             public void componentResized(ComponentEvent e)
             {
-                panel.setLocation((e.getComponent().getWidth() - GameContent.GAME_WIDTH) / 2, (e.getComponent().getHeight() - GameContent.GAME_HEIGHT) / 2);
+                panel.setLocation((int)((e.getComponent().getWidth() - GameContent.GAME_WIDTH) / 2d), (int)((e.getComponent().getHeight() - GameContent.GAME_HEIGHT) / 2d));
             }
 
             public void componentShown(ComponentEvent e){}

@@ -3,9 +3,9 @@ import java.awt.Graphics;
 public abstract class Source<T extends Movable> extends Movable
 {
 
-    public Source(int x, int y, GameContent game)
+    public Source(double x, double y, GameContent game)
     {
-        super(x, y, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, game);
+        super(x, y, 0, 0, Double.MAX_VALUE, Double.MAX_VALUE, game);
     }
 
     public void draw(Graphics g)

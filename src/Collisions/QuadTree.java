@@ -10,8 +10,8 @@ public class QuadTree implements Serializable
     static final int MAX_LEVEL = 9;
     static final int BRANCHING_LIMIT = 32;
     static final int MAX_NUM_LEAVES = 1 << MAX_LEVEL;
-    static final int WIDTH = GameContent.GAME_WIDTH;
-    static final int HEIGHT = GameContent.GAME_HEIGHT;
+    static final double WIDTH = GameContent.GAME_WIDTH;
+    static final double HEIGHT = GameContent.GAME_HEIGHT;
 
     private Node root;
     ArrayDeque<ArrayList<Drawable>> leaves;
@@ -26,7 +26,8 @@ public class QuadTree implements Serializable
         ArrayDeque<Node> stack = new ArrayDeque<Node>();
         stack.add(root);
         Node currentNode;
-        int xMin, xMid, xMax, yMin, yMid, yMax, nextLevel;
+        double xMin, xMid, xMax, yMin, yMid, yMax;
+        int nextLevel;
         while((currentNode = stack.pollLast()) != null)
         {
             if(currentNode.level < MAX_LEVEL)
@@ -68,7 +69,8 @@ public class QuadTree implements Serializable
         stack.add(root);
         oldStack.add(oldCurrentNode);
         Node currentNode;
-        int xMin, xMid, xMax, yMin, yMid, yMax, nextLevel;
+        double xMin, xMid, xMax, yMin, yMid, yMax;
+        int nextLevel;
 
         while((currentNode = stack.pollLast()) != null)
         {
@@ -149,7 +151,7 @@ public class QuadTree implements Serializable
         g.setColor(Color.gray);
         for(Node node : leafNodes)
         {
-            g.drawRect(node.xMin, node.yMin, node.xMax - node.xMin, node.yMax - node.yMin);
+            g.drawRect((int)node.xMin, (int)node.yMin, (int)(node.xMax - node.xMin), (int)(node.yMax - node.yMin));
         }
     }
 
@@ -183,13 +185,13 @@ public class QuadTree implements Serializable
         static final Node NULL_NODE = new Node(0, 0, 0, 0, 0);
 
         int level;
-        int xMin, xMax;
-        int yMin, yMax;
+        double xMin, xMax;
+        double yMin, yMax;
         Node upperLeft, upperRight, lowerLeft, lowerRight;
         int drawableCount;
         ArrayList<Drawable> drawablesInRegion;
 
-        private Node(int xMin, int xMax, int yMin, int yMax, int level)
+        private Node(double xMin, double xMax, double yMin, double yMax, int level)
         {
             this.xMin = xMin;
             this.xMax = xMax;
@@ -285,9 +287,8 @@ public class QuadTree implements Serializable
         public static class Mempool
         {
             private static ArrayDeque<Node> available = new ArrayDeque<Node>(2048);
-            private static int nodeCount = 2048;
 
-            public static Node checkout(int xMin, int xMax, int yMin, int yMax, int level)
+            public static Node checkout(double xMin, double xMax, double yMin, double yMax, int level)
             {
                 if(available.isEmpty())
                     makeMoreNodes();
@@ -312,8 +313,6 @@ public class QuadTree implements Serializable
             {
                 for(int i = 0; i < 1024; ++i)
                     available.addLast(new Node(0, 0, 0, 0, 0));
-
-                nodeCount += 1024;
             }
 
             public static void returnNode(Node toReturn)

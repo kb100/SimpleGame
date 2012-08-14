@@ -1,15 +1,14 @@
 public class SnowflakeSource extends Source<Snowflake>
 {
 
-    public SnowflakeSource(int x, int y, GameContent game)
+    public SnowflakeSource(double x, double y, GameContent game)
     {
         super(x, y, game);
     }
 
     public void produceMovable()
     {
-        for(int i = 0; i < 1; ++i)
-            game.addMovable(Snowflake.Mempool.checkoutSnowflake(x, y, game));
+        game.addMovable(Snowflake.Mempool.checkoutSnowflake(x, y, game));
     }
 
 }
