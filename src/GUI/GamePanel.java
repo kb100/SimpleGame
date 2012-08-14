@@ -100,7 +100,7 @@ public class GamePanel extends JPanel implements ActionListener
         {
 
             g.setColor(Color.green);
-            g.drawString("FPS: " + FPSInfo.getFPS(), 10, 15);
+            g.drawString("FPS: " + FPSInfo.getLastFPS(), 10, 15);
             g.drawString("drawables: " + game.drawables.size(), 10, 30);
             g.drawString("movables: " + game.movables.size(), 10, 45);
             g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
@@ -114,6 +114,7 @@ public class GamePanel extends JPanel implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
         game.run();
+        FPSInfo.frameTick();
         repaint();
     }
 
