@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 public class Snowflake extends SolidRectangle
 {
     private int age;
-    private static final int MAX_AGE=5;
+    private static final int MAX_AGE = 20;
     private static int randIndex = 0;
     private static int[] randomInts = new int[2048];
     static
@@ -21,21 +21,23 @@ public class Snowflake extends SolidRectangle
     private Snowflake(double x, double y, GameContent game)
     {
         super(x, y, randomSnowflakeSize(), randomSnowflakeSize(), randomSnowflakeColor(), game);
-        this.dxMax = 5;
-        this.dyMax = 5;
-        ddy = 1;
+        dyMax = GameContent.TERMINAL_VELOCITY_PPN * .35d;
+        dxMax = GameContent.TERMINAL_VELOCITY_PPN * .2d;
+        ddy = GameContent.GRAVITY_PPNN;
         ddx = 0;
         age = 0;
-        dx += (randInt(7) - 4);
-        dy += (randInt(8) - 4);
+        dx = GameContent.TERMINAL_VELOCITY_PPN / 10 * (GameContent.rand.nextDouble() - .5);
+        dy = GameContent.TERMINAL_VELOCITY_PPN * (GameContent.rand.nextDouble() - .1);
     }
 
     public void control()
     {
-        if(dy > 3 || dy < -3)
+        if(dy > (dyMax * .75d) || dy < (-dyMax * .75d))
         {
-            dx += randInt(3) - 1;
-            dy += randInt(4) - 2;
+            slowX((GameContent.rand.nextDouble() - .5d) * GameContent.TERMINAL_VELOCITY_PPN / 20d);
+            slowY((GameContent.rand.nextDouble() - .5d) * GameContent.TERMINAL_VELOCITY_PPN / 20d);
+            dx += (GameContent.rand.nextDouble() - .5d) * GameContent.TERMINAL_VELOCITY_PPN / 20d;
+            dy += (GameContent.rand.nextDouble() - .5d) * GameContent.TERMINAL_VELOCITY_PPN / 15d;
         }
         if(randInt(32) == 0)
             decay();
@@ -89,8 +91,8 @@ public class Snowflake extends SolidRectangle
             snowflake.y = y;
             snowflake.age = 0;
             snowflake.game = game;
-            snowflake.dx = (randInt(7) - 4);
-            snowflake.dy = (randInt(8) - 4);
+            snowflake.dx = GameContent.TERMINAL_VELOCITY_PPN / 2d * (GameContent.rand.nextDouble() - .5d);
+            snowflake.dy = GameContent.TERMINAL_VELOCITY_PPN * (GameContent.rand.nextDouble() - .5d);
 
             return snowflake;
         }

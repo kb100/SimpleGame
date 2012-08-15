@@ -27,7 +27,7 @@ public class LocalPlayer extends Movable
 
     public LocalPlayer(double x, double y, double width, double height, GameContent game)
     {
-        super(x, y, width, height, 8, 18, game);
+        super(x, y, width, height, GameContent.TERMINAL_VELOCITY_PPN / 2, GameContent.TERMINAL_VELOCITY_PPN, game);
 
         this.color = Color.WHITE;
 
@@ -40,13 +40,13 @@ public class LocalPlayer extends Movable
     public void control()
     {
         ControllerState state = controller.getControllerState();
-        ddy = 1;
+        ddy = GameContent.GRAVITY_PPNN;
         if(disabledTime == 0)
         {
             if(state.left)
-                ddx = -1;
+                ddx = -GameContent.GRAVITY_PPNN;
             else if(state.right)
-                ddx = 1;
+                ddx = GameContent.GRAVITY_PPNN;
             else
                 ddx = 0;
 
@@ -100,22 +100,10 @@ public class LocalPlayer extends Movable
 
     public void jump()
     {
-        dy = -10;
+        dy = -GameContent.TERMINAL_VELOCITY_PPN * .6d;
     }
 
-    public void slow(double xSlow, double ySlow)
-    {
-        if(dx > 0)
-            dx -= xSlow;
-        else
-            dx += xSlow;
-
-        if(dy > 0)
-            dy -= ySlow;
-        else
-            dy += ySlow;
-    }
-
+ 
     public void disable(int time)
     {
         disabledTime += time;

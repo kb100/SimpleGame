@@ -22,11 +22,17 @@ public class GameContent implements Serializable, Runnable
     static final Toolkit toolkit = Toolkit.getDefaultToolkit();
     static final Dimension dim = toolkit.getScreenSize();
     static final double GAME_WIDTH = dim.width - 10;
-    static final double GAME_HEIGHT = dim.height - 150;
+    static final double GAME_HEIGHT = dim.height - 320;
 
     static final double PLAYER_HEIGHT = 50;
     static final double PLAYER_WIDTH = 25;
     static final int NUM_PLATFORMS = 500;
+
+    static final double GRAVITY_PPSS = 1400d;
+    static final double GRAVITY_PPNN = GRAVITY_PPSS * FPSInfo.SECONDS_PER_NANOSECOND * FPSInfo.SECONDS_PER_NANOSECOND;
+    static final double TERMINAL_VELOCITY_PPS = 600d;
+    static final double TERMINAL_VELOCITY_PPN = TERMINAL_VELOCITY_PPS * FPSInfo.SECONDS_PER_NANOSECOND;
+    static final double FRICTION_PPN = 500_000_000d * FPSInfo.SECONDS_PER_NANOSECOND;
 
     static Random rand = new Random();
     static
@@ -75,6 +81,9 @@ public class GameContent implements Serializable, Runnable
         SolidRectangle floor = new SolidRectangle(20, GAME_HEIGHT - 40, GAME_WIDTH - 40, 20, Color.GRAY, this);
         addDrawable(floor);
 
+        SolidRectangle wall = new SolidRectangle(GAME_HEIGHT - 40, 20, 20, GAME_HEIGHT - 40, Color.gray, this);
+        addDrawable(wall);
+
         for(int i = 0; i < NUM_PLATFORMS; i++)
         {
             addDrawable(new SolidRectangle(rand.nextInt(5000) - 2500, rand.nextInt(5000) - 2500, 30 + rand.nextInt(50), 20 + rand.nextInt(40), randomColor(), this));
@@ -98,6 +107,7 @@ public class GameContent implements Serializable, Runnable
     public void run()
     {
         addOrRemoveQueuedElements();
+        // System.out.println("ddyInPixelsPerSecond: " + player.ddy * FPSInfo.NANOSECONDS_PER_SECOND);
 
         for(Movable movable : movables)
         {

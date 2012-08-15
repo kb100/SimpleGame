@@ -99,44 +99,54 @@ public class CollisionHandler
             {
                 // do a horizontal shift
                 sign = (intersection.getCenterX() - snowflake.toRectangle().getCenterX()) < 0 ? 1 : -1;
-                snowflake.unconditionalShift((intersection.width) * sign, 0);
-                snowflake.dx = 0;
+                snowflake.unconditionalShift((intersection.width / 2) * sign, 0);
+                // snowflake.dx = 0;
             }
             if(intersection.width >= intersection.height)
             {
                 // do a vertical shift
                 sign = (intersection.getCenterY() - snowflake.toRectangle().getCenterY()) < 0 ? 1 : -1;
                 snowflake.unconditionalShift(0, (intersection.height) * sign);
-                snowflake.dx = snowflake.ddx = snowflake.dy = 0;
+                // snowflake.dx = snowflake.ddx = 0;
             }
 
             if(rectangle.toRectangle().contains(snowflake.toRectangle()))
-                snowflake.remove();
+            {
+                if(rectangle.width > rectangle.height && snowflake.y + snowflake.height / 2 < rectangle.y + rectangle.height / 2)
+                    snowflake.y = rectangle.y - snowflake.height;
+                else
+                    snowflake.remove();
+
+            }
         }
+        snowflake.slowX(GameContent.FRICTION_PPN);
+        snowflake.decay();
     }
 
     public static void handleCollision(Snowflake snowflake, Snowflake snowflake2)
     {
         Area area = new Area(snowflake.toRectangle());
         area.intersect(new Area(snowflake2.toRectangle()));
-        if(!area.isEmpty() && snowflake.dy < 2 && snowflake2.dy < 2)
+        if(!area.isEmpty())
         {
             int sign;
             Rectangle intersection = area.getBounds();
-            if(intersection.width <= intersection.height)
-            {
-                // do a horizontal shift
-                sign = (intersection.getCenterX() - snowflake.toRectangle().getCenterX()) < 0 ? 1 : -1;
-                snowflake.unconditionalShift((intersection.width) * sign, 0);
-            }
-            if(intersection.width >= intersection.height)
-            {
-                // do a vertical shift
-                sign = (intersection.getCenterY() - snowflake.toRectangle().getCenterY()) < 0 ? 1 : -1;
-                snowflake.unconditionalShift(0, (intersection.height) * sign);
-                snowflake.dy = 0;
-                snowflake2.dy = 0;
-            }
+            // if(intersection.width <= intersection.height)
+            // {
+            // // do a horizontal shift
+            // sign = (intersection.getCenterX() - snowflake.toRectangle().getCenterX()) < 0 ? 1 : -1;
+            // snowflake.unconditionalShift((intersection.width) * sign, 0);
+            // }
+            // if(intersection.width >= intersection.height)
+            // {
+            // do a vertical shift
+            sign = (intersection.getCenterY() - snowflake.toRectangle().getCenterY()) < 0 ? 1 : -1;
+            snowflake.unconditionalShift(0, (intersection.height) * sign);
+            // snowflake.dy = 0;
+            // snowflake2.dy = 0;
+            // }
+            snowflake.slowX(GameContent.FRICTION_PPN);
+            snowflake2.slowX(GameContent.FRICTION_PPN);
         }
     }
 
@@ -193,16 +203,22 @@ public class CollisionHandler
             {
                 // do a horizontal shift
                 sign = (intersection.getCenterX() - player.toRectangle().getCenterX()) < 0 ? 1 : -1;
-                player.unconditionalShift((intersection.width) * sign, 0);
+                if(sign == 1)
+                    player.x = rectangle.x + rectangle.width;
+                else
+                    player.x = rectangle.x - player.width;
                 player.dx = 0;
                 if(player.ddx * sign < 0)
-                    player.slow(0, 1);
+                    player.slow(0, GameContent.FRICTION_PPN * Math.abs(player.dy));
             }
             if(intersection.width >= intersection.height)
             {
                 // do a vertical shift
                 sign = (intersection.getCenterY() - player.toRectangle().getCenterY()) < 0 ? 1 : -1;
-                player.unconditionalShift(0, (intersection.height) * sign);
+                if(sign == 1)
+                    player.y = rectangle.y + rectangle.height;
+                else
+                    player.y = rectangle.y - player.height;
                 player.land();
             }
 
