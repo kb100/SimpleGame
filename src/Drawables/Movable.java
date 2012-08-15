@@ -74,4 +74,13 @@ public abstract class Movable extends Drawable
         }
     }
 
+    public void setSpeedAndDirection(double speed, double relativeToThisX, double relativeToThisY)
+    {
+        double xDifference = relativeToThisX - (x + width * .5d);
+        double yDifference = relativeToThisY - (y + height * .5d);
+        double speedDividedByMagnitude = speed / Math.sqrt(xDifference * xDifference + yDifference * yDifference);
+        dx = xDifference * speedDividedByMagnitude;
+        dy = yDifference * speedDividedByMagnitude;
+    }
+
 }

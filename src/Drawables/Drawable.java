@@ -40,4 +40,14 @@ public abstract class Drawable implements Serializable
     {
         return x + width >= 0 && x < GameContent.GAME_WIDTH && y + height >= 0 && y < GameContent.GAME_HEIGHT;
     }
+    
+    public double getCenterX()
+    {
+        return .5d * width + x;
+    }
+    
+    public double getCenterY()
+    {
+        return .5d * height + y;
+    }
 }

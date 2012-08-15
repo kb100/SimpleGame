@@ -17,7 +17,7 @@ public class LandMine extends SolidRectangle
     {
         super(x, y, 20, 10, Color.GRAY, game);
         timeUntilExplode = 20;
-        dyMax = 18;
+        dyMax = GameContent.TERMINAL_VELOCITY_PPN / 2;
     }
 
     public void control()
@@ -27,7 +27,8 @@ public class LandMine extends SolidRectangle
             timeUntilExplode++;
         if(timeUntilExplode == 20)
             color = Color.GRAY;
-        else color = Color.RED;
+        else
+            color = Color.RED;
     }
 
     public void tick()
@@ -54,12 +55,10 @@ public class LandMine extends SolidRectangle
         List<LocalPlayer> players = game.findPlayersInArea(new Rectangle2D.Double(x - 10, y - 10, width + 20, width + 20));
         for(LocalPlayer player : players)
         {
-            player.dx = ((player.x + player.width / 2) - (x + width / 2));
-            player.dy = ((player.y + player.height / 2) - (y + height / 2));
+            player.setSpeedAndDirection(GameContent.TERMINAL_VELOCITY_PPN, 2 * player.getCenterX() - getCenterX(), 2 * player.getCenterY() - getCenterY());
             player.disable(50);
         }
 
         remove();
     }
-
 }
