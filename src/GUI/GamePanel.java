@@ -1,20 +1,20 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
-public class GamePanel extends JPanel implements ActionListener
+public class GamePanel extends JPanel// implements ActionListener
 {
-
-    Timer timer;
+    // Timer timer;
+    private static final Object lock = new Object();
+    
     GameContent game;
     GameController controller;
     GameController controller2;
@@ -43,14 +43,18 @@ public class GamePanel extends JPanel implements ActionListener
         this.addKeyListener(controller2);
         game.player2.controller = controller2;
 
-        timer = new Timer(25, this);
-        timer.start();
+        // timer = new Timer(25, this);
+        // timer.start();
 
         this.addKeyListener(new KeyListener()
         {
-            public void keyTyped(KeyEvent e){}
+            public void keyTyped(KeyEvent e)
+            {
+            }
 
-            public void keyReleased(KeyEvent e){}
+            public void keyReleased(KeyEvent e)
+            {
+            }
 
             public void keyPressed(KeyEvent e)
             {
@@ -68,7 +72,7 @@ public class GamePanel extends JPanel implements ActionListener
                 }
                 else if(code == KeyEvent.VK_2)
                 {
-                    toggleTimerSpeed();
+                    // toggleTimerSpeed();
                 }
                 else if(code == KeyEvent.VK_3)
                 {
@@ -84,47 +88,68 @@ public class GamePanel extends JPanel implements ActionListener
                 }
             }
         });
+
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                while(true)
+                {
+                    synchronized(lock)
+                    {
+                        game.run();
+                    }
+                        FPSInfo.frameTick();
+                        repaint();
+                    
+                }
+            }
+        }).start();
+
     }
 
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
 
-        for(Drawable drawMe : game.drawables)
+        synchronized(lock)
         {
-            if(drawMe.isOnScreen())
-                drawMe.draw(g);
+            for(Drawable drawMe : game.drawables)
+            {
+                if(drawMe.isOnScreen())
+                    drawMe.draw(g);
+            }
+
+            if(drawFPSInfo)
+            {
+
+                g.setColor(Color.green);
+                g.drawString("FPS: " + FPSInfo.getLastFPS(), 10, 15);
+                g.drawString("drawables: " + game.drawables.size(), 10, 30);
+                g.drawString("movables: " + game.movables.size(), 10, 45);
+                g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
+            }
+
+            if(drawQuadTree)
+                game.tree.draw(g);
         }
 
-        if(drawFPSInfo)
-        {
-
-            g.setColor(Color.green);
-            g.drawString("FPS: " + FPSInfo.getLastFPS(), 10, 15);
-            g.drawString("drawables: " + game.drawables.size(), 10, 30);
-            g.drawString("movables: " + game.movables.size(), 10, 45);
-            g.drawString("removeQueue: " + game.removeQueue.size(), 10, 60);
-        }
-
-        if(drawQuadTree)
-            game.tree.draw(g);
-
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-        game.run();
-        FPSInfo.frameTick();
-        repaint();
-    }
+    // public void actionPerformed(ActionEvent e)
+    // {
+    // game.run();
+    // FPSInfo.frameTick();
+    // repaint();
+    // }
 
-    public void toggleTimerSpeed()
-    {
-        if(timer.getDelay() == 25)
-            timer.setDelay(500);
-        else
-            timer.setDelay(25);
-    }
+    // public void toggleTimerSpeed()
+    // {
+    // if(timer.getDelay() == 25)
+    // timer.setDelay(500);
+    // else
+    // timer.setDelay(25);
+    // }
 
     public synchronized void loadSavedState()
     {
