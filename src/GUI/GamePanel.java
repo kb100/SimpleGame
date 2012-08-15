@@ -10,11 +10,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
 
-public class GamePanel extends JPanel// implements ActionListener
+public class GamePanel extends JPanel
 {
-    // Timer timer;
     private static final Object lock = new Object();
-    
+
     GameContent game;
     GameController controller;
     GameController controller2;
@@ -28,6 +27,7 @@ public class GamePanel extends JPanel// implements ActionListener
         this.setSize((int)GameContent.GAME_WIDTH, (int)GameContent.GAME_HEIGHT);
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
+        this.setIgnoreRepaint(true);
 
         save = null;
 
@@ -99,9 +99,17 @@ public class GamePanel extends JPanel// implements ActionListener
                     {
                         game.run();
                     }
-                        FPSInfo.frameTick();
-                        repaint();
-                    
+                    FPSInfo.frameTick();
+                    repaint();
+                    try
+                    {
+                        Thread.currentThread();
+                        Thread.sleep(1);
+                    }
+                    catch(InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();
@@ -135,21 +143,6 @@ public class GamePanel extends JPanel// implements ActionListener
         }
 
     }
-
-    // public void actionPerformed(ActionEvent e)
-    // {
-    // game.run();
-    // FPSInfo.frameTick();
-    // repaint();
-    // }
-
-    // public void toggleTimerSpeed()
-    // {
-    // if(timer.getDelay() == 25)
-    // timer.setDelay(500);
-    // else
-    // timer.setDelay(25);
-    // }
 
     public synchronized void loadSavedState()
     {

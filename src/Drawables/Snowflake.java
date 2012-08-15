@@ -3,8 +3,8 @@ import java.util.ArrayDeque;
 
 public class Snowflake extends SolidRectangle
 {
-    private int age;
-    private static final int MAX_AGE = 20;
+    private double age;
+    private static final double MAX_AGE = 5*FPSInfo.NANOSECONDS_PER_SECOND;
     private static int randIndex = 0;
     private static int[] randomInts = new int[2048];
     static
@@ -39,16 +39,16 @@ public class Snowflake extends SolidRectangle
             dx += (GameContent.rand.nextDouble() - .5d) * GameContent.TERMINAL_VELOCITY_PPN / 20d;
             dy += (GameContent.rand.nextDouble() - .5d) * GameContent.TERMINAL_VELOCITY_PPN / 15d;
         }
-        if(randInt(32) == 0)
-            decay();
+        
+        decay();
 
     }
 
     public void decay()
     {
-        age++;
+        age += FPSInfo.getNanosSinceLastUpdate();
         color = randomSnowflakeColor();
-        if(age == MAX_AGE)
+        if(age >= MAX_AGE)
         {
             this.remove();
         }
